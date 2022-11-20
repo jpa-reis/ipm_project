@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
                 builder: (context) => const GardenDrawer()
               ),
             },
-            child: const Text('SHOW GARDENS'),
+            child: const Text('SHOW GARDENS!'),
           ),
       ),
     );
