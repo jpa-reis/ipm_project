@@ -68,18 +68,25 @@ class _HomePageState extends State<HomePage> {
           Positioned(
             right: 15,
             bottom: buttonHeight,
-            child: buildButton(context),
+            child: markerButton(context),
+          ),
+          Positioned(
+            left: 15,
+            bottom: buttonHeight,
+            child: FloatingActionButton(onPressed: () {}),
           ),
         ],
       )
     );
   }
 
-  Widget buildButton(BuildContext context) {
+  Widget markerButton(BuildContext context) {
+    Color transparencyLvl = Colors.white.withOpacity(0.7);
+
     return SpeedDial(
       overlayOpacity: 0,
       icon: Icons.location_on,
-      backgroundColor: Colors.white.withOpacity(0.6),
+      backgroundColor: transparencyLvl,
       foregroundColor: const Color(0xFF383838),
       elevation: 0.4,
       buttonSize: const Size(50.0, 50.0),
@@ -87,38 +94,19 @@ class _HomePageState extends State<HomePage> {
       children: [
         SpeedDialChild(
           child: const Icon(Icons.search),
-          backgroundColor: Colors.white.withOpacity(0.6),
+          backgroundColor: transparencyLvl,
           foregroundColor: const Color(0xFF383838),
           elevation: 0.4,
           onTap: () {}
         ),
         SpeedDialChild(
           child: const Icon(Icons.add),
-          backgroundColor: Colors.white.withOpacity(0.6),
+          backgroundColor: transparencyLvl,
           foregroundColor: const Color(0xFF383838),
           elevation: 0.4,
           onTap: () {}
         ),
       ],
-    );
-  }
-
-  Widget exampleButton(BuildContext context) {
-    return Theme(
-        data: Theme.of(context).copyWith(
-            floatingActionButtonTheme: const FloatingActionButtonThemeData(
-              sizeConstraints: BoxConstraints.tightFor(width: 50, height: 50),
-            ),
-        ),
-        child: FloatingActionButton(
-          elevation: 0.2,
-          onPressed: () {  },
-          backgroundColor: Colors.white.withOpacity(0.6),
-          child: const Icon(
-            Icons.location_on,
-            color: Color(0xFF383838),
-          ),
-        ),
     );
   }
 
