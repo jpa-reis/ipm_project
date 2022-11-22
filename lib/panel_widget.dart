@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'new_page.dart';
+import 'timeline.dart';
 
 class PanelWidget extends StatelessWidget {
 
@@ -55,7 +55,7 @@ class PanelWidget extends StatelessWidget {
             title: const Text("Jardim Botânico de Lisboa"),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const NewPage())
+                  builder: (context) => const Timeline())
               );
             }
         ),

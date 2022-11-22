@@ -9,9 +9,9 @@ class Timeline extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         body: DefaultTabController(
-      animationDuration: Duration.zero,
-      length: 2,
-      child: Scaffold(
+        animationDuration: Duration.zero,
+        length: 2,
+        child: Scaffold(
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(70),
           child: Theme(
@@ -114,9 +114,12 @@ class Timeline extends StatelessWidget {
           Icon(Icons.movie),
         ]),
         bottomNavigationBar: const BottomAppBar(
-          color: Colors.lightGreen,
-          child: Text("Rose", textAlign: TextAlign.center, style: TextStyle(fontSize: 25, color: Colors.white), )
-        ),
+            color: Colors.lightGreen,
+            child: Text(
+              "Rose",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 25, color: Colors.white),
+            )),
       ),
     ));
   }
