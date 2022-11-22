@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ipm_project/panel_widget.dart';
 import 'white_theme.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 
 void main() {
@@ -35,17 +36,18 @@ class HomePage extends StatefulWidget {
 
 
 class _HomePageState extends State<HomePage> {
-  static const double buttonHeightClosed = 90.0;
+  static const double buttonHeightClosed = 75.0;
   double buttonHeight = buttonHeightClosed;
 
   final panelController = PanelController();
 
   @override
   Widget build(BuildContext context) {
-    final panelHeightClosed = MediaQuery.of(context).size.height * 0.12;
+    final panelHeightClosed = MediaQuery.of(context).size.height * 0.1;
     final panelHeightOpen = MediaQuery.of(context).size.height * 0.9;
 
     return Scaffold(
+      backgroundColor: Colors.blue,  // will be removed
       body: Stack(
         alignment: Alignment.topCenter,
         children: <Widget>[
@@ -74,13 +76,49 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildButton(BuildContext context) {
-    return FloatingActionButton(
-      backgroundColor: Colors.white,
-      onPressed: () {  },
-      child: const Icon(
-        Icons.location_on,
-        color: Color(0xFF797979),
-      ),
+    return SpeedDial(
+      overlayOpacity: 0,
+      icon: Icons.location_on,
+      backgroundColor: Colors.white.withOpacity(0.6),
+      foregroundColor: const Color(0xFF383838),
+      elevation: 0.4,
+      buttonSize: const Size(50.0, 50.0),
+      spacing: 7,
+      children: [
+        SpeedDialChild(
+          child: const Icon(Icons.search),
+          backgroundColor: Colors.white.withOpacity(0.6),
+          foregroundColor: const Color(0xFF383838),
+          elevation: 0.4,
+          onTap: () {}
+        ),
+        SpeedDialChild(
+          child: const Icon(Icons.add),
+          backgroundColor: Colors.white.withOpacity(0.6),
+          foregroundColor: const Color(0xFF383838),
+          elevation: 0.4,
+          onTap: () {}
+        ),
+      ],
+    );
+  }
+
+  Widget exampleButton(BuildContext context) {
+    return Theme(
+        data: Theme.of(context).copyWith(
+            floatingActionButtonTheme: const FloatingActionButtonThemeData(
+              sizeConstraints: BoxConstraints.tightFor(width: 50, height: 50),
+            ),
+        ),
+        child: FloatingActionButton(
+          elevation: 0.2,
+          onPressed: () {  },
+          backgroundColor: Colors.white.withOpacity(0.6),
+          child: const Icon(
+            Icons.location_on,
+            color: Color(0xFF383838),
+          ),
+        ),
     );
   }
 
