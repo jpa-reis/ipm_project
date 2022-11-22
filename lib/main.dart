@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:ipm_project/panel_widget.dart';
 import 'white_theme.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'timeline.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 
 void main() {
@@ -47,43 +46,37 @@ class _HomePageState extends State<HomePage> {
     final panelHeightClosed = MediaQuery.of(context).size.height * 0.1;
     final panelHeightOpen = MediaQuery.of(context).size.height * 0.9;
 
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.blue,  // will be removed
-        body: Stack(
-          alignment: Alignment.topCenter,
-          children: <Widget>[
-
-            // WIDGET A COPIAR PARA TER ACESSO AO DRAWER
-            SlidingUpPanel(
-              controller: panelController,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-              maxHeight: panelHeightOpen,
-              minHeight: panelHeightClosed,
-              panelBuilder: (controller) => PanelWidget(
-                controller: controller,
-                panelController: panelController,
-              ),
-              onPanelSlide: (position) => setState(() {
-                final buttonPosition = panelHeightOpen - panelHeightClosed;
-                buttonHeight = position * buttonPosition + buttonHeightClosed;
-              }),
+    return Scaffold(
+      backgroundColor: Colors.blue,  // will be removed
+      body: Stack(
+        alignment: Alignment.topCenter,
+        children: <Widget>[
+          SlidingUpPanel(
+            controller: panelController,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+            maxHeight: panelHeightOpen,
+            minHeight: panelHeightClosed,
+            panelBuilder: (controller) => PanelWidget(
+              controller: controller,
+              panelController: panelController,
             ),
-            // ----------------------------------------
-
-            Positioned(
-              right: 15,
-              bottom: buttonHeight,
-              child: markerButton(context),
-            ),
-            Positioned(
-              left: 15,
-              bottom: buttonHeight,
-              child: FloatingActionButton(onPressed: () {}),
-            ),
-          ],
-        )
-      ),
+            onPanelSlide: (position) => setState(() {
+              final buttonPosition = panelHeightOpen - panelHeightClosed;
+              buttonHeight = position * buttonPosition + buttonHeightClosed;
+            }),
+          ),
+          Positioned(
+            right: 15,
+            bottom: buttonHeight,
+            child: markerButton(context),
+          ),
+          Positioned(
+            left: 15,
+            bottom: buttonHeight,
+            child: FloatingActionButton(onPressed: () {}),
+          ),
+        ],
+      )
     );
   }
 
