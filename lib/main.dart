@@ -35,6 +35,8 @@ class HomePage extends StatefulWidget {
 
 
 class _HomePageState extends State<HomePage> {
+  static const double buttonHeightClosed = 90.0;
+  double buttonHeight = buttonHeightClosed;
 
   final panelController = PanelController();
 
@@ -52,14 +54,35 @@ class _HomePageState extends State<HomePage> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
             maxHeight: panelHeightOpen,
             minHeight: panelHeightClosed,
-            panelBuilder: (scrollcontroller) => PanelWidget(
-              scrollController: scrollcontroller,
+            panelBuilder: (controller) => PanelWidget(
+              controller: controller,
               panelController: panelController,
             ),
+            onPanelSlide: (position) => setState(() {
+              final buttonPosition = panelHeightOpen - panelHeightClosed;
+              buttonHeight = position * buttonPosition + buttonHeightClosed;
+            }),
+          ),
+          Positioned(
+            right: 15,
+            bottom: buttonHeight,
+            child: buildButton(context),
           ),
         ],
       )
     );
   }
+
+  Widget buildButton(BuildContext context) {
+    return FloatingActionButton(
+      backgroundColor: Colors.white,
+      onPressed: () {  },
+      child: const Icon(
+        Icons.location_on,
+        color: Color(0xFF797979),
+      ),
+    );
+  }
+
 
 }
