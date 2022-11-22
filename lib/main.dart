@@ -51,6 +51,8 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
         alignment: Alignment.topCenter,
         children: <Widget>[
+
+          // WIDGET A COPIAR PARA TER ACESSO AO DRAWER
           SlidingUpPanel(
             controller: panelController,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
@@ -65,6 +67,8 @@ class _HomePageState extends State<HomePage> {
               buttonHeight = position * buttonPosition + buttonHeightClosed;
             }),
           ),
+          // -----------------------------------
+
           Positioned(
             right: 15,
             bottom: buttonHeight,
