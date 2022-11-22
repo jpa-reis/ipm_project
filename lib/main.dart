@@ -46,6 +46,7 @@ class _HomePageState extends State<HomePage> {
     final panelHeightClosed = MediaQuery.of(context).size.height * 0.1;
     final panelHeightOpen = MediaQuery.of(context).size.height * 0.9;
 
+    //CHANGE body: widget TO A DIFFERENT WIDGET TO CHANGE MAIN PAGE
     return Scaffold(
       backgroundColor: Colors.blue,  // will be removed
       body: Stack(
