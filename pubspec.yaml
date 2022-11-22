@@ -39,7 +39,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   sliding_up_panel: ^2.0.0+1
   flutter_speed_dial: ^6.2.0
-
+  toggle_switch: ^2.0.1
 
 dev_dependencies:
   flutter_test:
