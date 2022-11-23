@@ -38,12 +38,15 @@ final panelController = PanelController();
 class _HomePageState extends State<HomePage> {
   static const Color iconColor = Color(0xFF383838);
   static const double elevation = 0.7;
-  static const double initButtonPosition = buttonSize + 50.0;
+  static const double initButtonPosition = buttonSize + 30.0;
   static const Duration fadeTime = Duration(milliseconds: 200);
   Color transparencyLvl = Colors.white.withOpacity(0.7);
   double buttonPosition = initButtonPosition;
   double padding = 15.0;
   bool panelClosed = true;
+  bool openMapSearch = false;
+
+  TextEditingController editingController = TextEditingController();
 
   @override
   void initState() {
@@ -54,7 +57,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final panelHeightClosed = MediaQuery.of(context).size.height * 0.1;
+    final panelHeightClosed = MediaQuery.of(context).size.height * 0.08;
     final panelHeightOpen = MediaQuery.of(context).size.height * 0.9;
     padding = MediaQuery.of(context).size.height * 0.02;
 
@@ -63,13 +66,18 @@ class _HomePageState extends State<HomePage> {
         body: Stack(
           alignment: Alignment.topCenter,
           children: <Widget>[
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  fit: BoxFit.fill,
-                  image: AssetImage('lib/help.png'),
+            GestureDetector(
+              onTap: () => setState(() {
+                openMapSearch = false;
+              }),
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.fill,
+                    image: AssetImage('lib/help.png'),
+                  ),
                 ),
               ),
             ),
@@ -87,9 +95,37 @@ class _HomePageState extends State<HomePage> {
               onPanelSlide: (position) => setState(() {
                 buttonPosition =
                     position * (panelHeightOpen - panelHeightClosed) +
-                        initButtonPosition;
+                    initButtonPosition;
                 panelClosed = ((buttonPosition - initButtonPosition) == 0);
+                openMapSearch = false;
               }),
+            ),
+
+            Positioned(
+              child: AnimatedOpacity(
+                opacity: openMapSearch ? 1 : 0,
+                duration: fadeTime,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: TextField(
+                    controller: editingController,
+                    decoration: const InputDecoration(
+                      hintText: "Search",
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: iconColor,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                              Radius.circular(25.0)
+                          )
+                      )
+                    ),
+                  ),
+                ),
+              ),
             ),
             // -----------------------------------
 
@@ -123,7 +159,7 @@ class _HomePageState extends State<HomePage> {
               top: padding,
               child: AnimatedOpacity(
                   duration: fadeTime,
-                  opacity: panelClosed ? 1 : 0,
+                  opacity: (panelClosed && !openMapSearch) ? 1 : 0,
                   child: generalButton(context, Icons.person)),
             ),
           ],
@@ -162,14 +198,22 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: transparencyLvl,
             foregroundColor: iconColor,
             elevation: elevation,
-            onTap: () {}),
+            onTap: () => setState(() {
+              openMapSearch = true;
+            }),
+        ),
         SpeedDialChild(
             child: const Icon(Icons.add),
             backgroundColor: transparencyLvl,
             foregroundColor: iconColor,
             elevation: elevation,
-            onTap: () {}),
+            onTap: () {},
+        ),
       ],
     );
   }
+
 }
+
+
+

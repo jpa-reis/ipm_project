@@ -2,20 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'timeline.dart';
 
-class PanelWidget extends StatelessWidget {
 
+final List gardens = [
+  {'title': "Jardim Botânico de Lisboa", 'navigate': const Timeline()},
+  {'title': "Jardim Zoológico", 'navigate': const Timeline()},
+  {'title': "Estufa Fria", 'navigate': const Timeline()}
+];
+
+class PanelWidget extends StatefulWidget {
   final ScrollController controller;
   final PanelController panelController;
 
   const PanelWidget({
     super.key,
     required this.controller,
-    required this.panelController
+    required this.panelController,
   });
 
-  void togglePanel() => panelController.isPanelOpen
-      ? panelController.close()
-      : panelController.open()
+  @override
+  State<PanelWidget> createState() => _PanelWidgetState();
+}
+
+class _PanelWidgetState extends State<PanelWidget> {
+  TextEditingController editingController = TextEditingController();
+
+
+  void togglePanel() => widget.panelController.isPanelOpen
+      ? widget.panelController.close()
+      : widget.panelController.open()
   ;
 
   Widget buildHandle() {
@@ -34,11 +48,13 @@ class PanelWidget extends StatelessWidget {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
+
     return ListView(
       padding: EdgeInsets.zero,
-      controller: controller,
+      controller: widget.controller,
       children: <Widget>[
         const SizedBox(height: 10),
         buildHandle(),
@@ -50,23 +66,30 @@ class PanelWidget extends StatelessWidget {
             ),
           ),
         ),
-        ListTile(
-            leading: const Icon(Icons.map),
-            title: const Text("Jardim Botânico de Lisboa"),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Timeline())
-              );
-            }
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextField(
+            controller: editingController,
+            decoration: const InputDecoration(
+                hintText: "Search",
+                prefixIcon: Icon(Icons.search),
+            ),
+          )
         ),
-        const ListTile(
-            leading: Icon(Icons.photo_album),
-            title: Text("Jardim Zoológico")
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: 3,
+          itemBuilder: (BuildContext context, int index) {
+            return ListTile(
+              title: Text(gardens[index]['title']),
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => gardens[index]['navigate'])
+                );
+              }
+            );
+          },
         ),
-        const ListTile(
-            leading: Icon(Icons.phone),
-            title: Text("Estufa Fria")
-        )
       ],
     );
   }
