@@ -1,23 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'timeline.dart';
-
-
-final List gardens = [
-  {'title': "Jardim Botânico de Lisboa", 'navigate': const Timeline()},
-  {'title': "Jardim Zoológico", 'navigate': const Timeline()},
-  {'title': "Estufa Fria", 'navigate': const Timeline()}
-];
+import 'globals.dart';
 
 class PanelWidget extends StatefulWidget {
   final ScrollController controller;
   final PanelController panelController;
 
   const PanelWidget({
-    super.key,
+    Key? key,
     required this.controller,
     required this.panelController,
-  });
+  }) : super(key: key);
 
   @override
   State<PanelWidget> createState() => _PanelWidgetState();
@@ -84,8 +77,8 @@ class _PanelWidgetState extends State<PanelWidget> {
               title: Text(gardens[index]['title']),
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => gardens[index]['navigate'])
-                );
+                    builder: (context) => gardens[index]['navigate']
+                ));
               }
             );
           },
@@ -95,3 +88,7 @@ class _PanelWidgetState extends State<PanelWidget> {
   }
 
 }
+/**onTap: () {
+Navigator.of(context).push(MaterialPageRoute(
+builder: (context) => marker.getPage()
+));**/

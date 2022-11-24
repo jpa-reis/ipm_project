@@ -1,4 +1,6 @@
+import 'package:decorated_icon/decorated_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:ipm_project/globals.dart';
 import 'package:ipm_project/panel_widget.dart';
 import 'white_theme.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -7,6 +9,9 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 void main() {
   runApp(const App());
 }
+
+const double buttonSize = 50.0;
+final panelController = PanelController();
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -32,8 +37,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-const double buttonSize = 50.0;
-final panelController = PanelController();
+
 
 class _HomePageState extends State<HomePage> {
   static const Color iconColor = Color(0xFF383838);
@@ -70,13 +74,50 @@ class _HomePageState extends State<HomePage> {
               onTap: () => setState(() {
                 openMapSearch = false;
               }),
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: AssetImage('lib/help.png'),
+              child: InteractiveViewer(
+                constrained: false,
+                scaleEnabled: false,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      fit: BoxFit.fill,
+                      image: AssetImage('lib/help.png'),
+                    ),
+                  ),
+                  child: CustomMultiChildLayout(
+                    delegate: MapLayout(),
+                    children: <Widget>[
+                      for (var marker in markers)
+                        LayoutId(
+                          id: markers.indexOf(marker),
+                          child: ElevatedButton(
+                            onPressed: () {  },
+                            style: const ButtonStyle(
+                              shape: MaterialStatePropertyAll<CircleBorder>(
+                                CircleBorder()
+                              ),
+                              shadowColor: MaterialStatePropertyAll<Color>(
+                                Colors.transparent
+                              ),
+                              backgroundColor: MaterialStatePropertyAll<Color>(
+                                  Colors.transparent),
+                              padding: MaterialStatePropertyAll<EdgeInsets>(
+                                  EdgeInsets.zero)
+                            ),
+                            child: DecoratedIcon(
+                              Icons.location_on,
+                              size: 40.0,
+                              shadows: [BoxShadow(
+                                offset: const Offset(1.5, 3.5),
+                                blurRadius: 10.0,
+                                color: const Color(0xFF3F3F3F).withOpacity(0.5),
+                              )],
+                            ),
+                          )
+                        )
+                    ],
                   ),
                 ),
               ),
@@ -85,7 +126,8 @@ class _HomePageState extends State<HomePage> {
             // WIDGET A COPIAR PARA TER ACESSO AO DRAWER
             SlidingUpPanel(
               controller: panelController,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(15)),
               maxHeight: panelHeightOpen,
               minHeight: panelHeightClosed,
               panelBuilder: (controller) => PanelWidget(
@@ -144,7 +186,8 @@ class _HomePageState extends State<HomePage> {
               child: AnimatedOpacity(
                   duration: fadeTime,
                   opacity: panelClosed ? 1 : 0,
-                  child: generalButton(context, Icons.settings)),
+                  child: generalButton(context, Icons.settings)
+              ),
             ),
             Positioned(
               left: padding,
@@ -152,7 +195,8 @@ class _HomePageState extends State<HomePage> {
               child: AnimatedOpacity(
                   duration: fadeTime,
                   opacity: panelClosed ? 1 : 0,
-                  child: generalButton(context, Icons.question_mark)),
+                  child: generalButton(context, Icons.question_mark)
+              ),
             ),
             Positioned(
               left: padding,
@@ -160,7 +204,8 @@ class _HomePageState extends State<HomePage> {
               child: AnimatedOpacity(
                   duration: fadeTime,
                   opacity: (panelClosed && !openMapSearch) ? 1 : 0,
-                  child: generalButton(context, Icons.person)),
+                  child: generalButton(context, Icons.person)
+              ),
             ),
           ],
 
@@ -215,5 +260,24 @@ class _HomePageState extends State<HomePage> {
 
 }
 
+class MapLayout extends MultiChildLayoutDelegate {
+  final constraints = const BoxConstraints(
+      maxHeight: 50.0,
+      maxWidth: 50.0
+  );
 
+  @override
+  void performLayout(Size size) {
+    for (final marker in markers) {
+      layoutChild(markers.indexOf(marker), constraints);
+      positionChild(markers.indexOf(marker), marker.getPosition());
+      print("WTF ${marker.getPosition()}");
+    }
+  }
 
+  @override
+  bool shouldRelayout(covariant MultiChildLayoutDelegate oldDelegate) {
+    return false;
+  }
+
+}
