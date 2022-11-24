@@ -1,4 +1,3 @@
-import 'package:decorated_icon/decorated_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:ipm_project/globals.dart';
 import 'package:ipm_project/panel_widget.dart';
@@ -38,8 +37,7 @@ class HomePage extends StatefulWidget {
 }
 
 
-
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   static const Color iconColor = Color(0xFF383838);
   static const double elevation = 0.7;
   static const double initButtonPosition = buttonSize + 30.0;
@@ -51,6 +49,9 @@ class _HomePageState extends State<HomePage> {
   bool openMapSearch = false;
 
   TextEditingController editingController = TextEditingController();
+  final TransformationController _transformationController =
+    TransformationController();
+
 
   @override
   void initState() {
@@ -59,11 +60,13 @@ class _HomePageState extends State<HomePage> {
     panelClosed = true;
   }
 
+
   @override
   Widget build(BuildContext context) {
-    final panelHeightClosed = MediaQuery.of(context).size.height * 0.08;
+    final panelHeightClosed = MediaQuery.of(context).size.height * 0.1;
     final panelHeightOpen = MediaQuery.of(context).size.height * 0.9;
     padding = MediaQuery.of(context).size.height * 0.02;
+    buttonPosition = panelHeightClosed + padding;
 
     return SafeArea(
       child: Scaffold(
@@ -71,20 +74,23 @@ class _HomePageState extends State<HomePage> {
           alignment: Alignment.topCenter,
           children: <Widget>[
             GestureDetector(
-              onTap: () => setState(() {
+              onTapDown: (details) => setState(() {
                 openMapSearch = false;
+                var position = details.globalPosition;
               }),
               child: InteractiveViewer(
+                transformationController: _transformationController,
                 constrained: false,
-                scaleEnabled: false,
+                scaleEnabled: true,
+                minScale: 0.2,
                 child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
+                  width: 4000,
+                  height: 2500,
                   decoration: const BoxDecoration(
                     image: DecorationImage(
-                      fit: BoxFit.fill,
-                      image: AssetImage('lib/help.png'),
-                    ),
+                        fit: BoxFit.fill,
+                        image: AssetImage('lib/jardim.png')
+                    )
                   ),
                   child: CustomMultiChildLayout(
                     delegate: MapLayout(),
@@ -92,29 +98,13 @@ class _HomePageState extends State<HomePage> {
                       for (var marker in markers)
                         LayoutId(
                           id: markers.indexOf(marker),
-                          child: ElevatedButton(
-                            onPressed: () {  },
-                            style: const ButtonStyle(
-                              shape: MaterialStatePropertyAll<CircleBorder>(
-                                CircleBorder()
-                              ),
-                              shadowColor: MaterialStatePropertyAll<Color>(
-                                Colors.transparent
-                              ),
-                              backgroundColor: MaterialStatePropertyAll<Color>(
-                                  Colors.transparent),
-                              padding: MaterialStatePropertyAll<EdgeInsets>(
-                                  EdgeInsets.zero)
-                            ),
-                            child: DecoratedIcon(
-                              Icons.location_on,
-                              size: 40.0,
-                              shadows: [BoxShadow(
-                                offset: const Offset(1.5, 3.5),
-                                blurRadius: 10.0,
-                                color: const Color(0xFF3F3F3F).withOpacity(0.5),
-                              )],
-                            ),
+                          child: IconButton(
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => marker.getPage()
+                              ));
+                            },
+                            icon: const Icon(Icons.location_on),
                           )
                         )
                     ],
@@ -271,7 +261,6 @@ class MapLayout extends MultiChildLayoutDelegate {
     for (final marker in markers) {
       layoutChild(markers.indexOf(marker), constraints);
       positionChild(markers.indexOf(marker), marker.getPosition());
-      print("WTF ${marker.getPosition()}");
     }
   }
 
@@ -280,4 +269,22 @@ class MapLayout extends MultiChildLayoutDelegate {
     return false;
   }
 
+}
+
+
+class Marker {
+  final Offset position;
+  final Widget page;
+
+  const Marker({
+    required this.position,
+    required this.page});
+
+  Offset getPosition() {
+    return position;
+  }
+
+  Widget getPage() {
+    return page;
+  }
 }
