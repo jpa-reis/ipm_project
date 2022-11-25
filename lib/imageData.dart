@@ -4,20 +4,20 @@ import 'package:flutter/material.dart';
 
 class ImageData{
   final String date;
-  final Offset markerPosition;
+  final int markerIndex;
   final String imagePath;
   String description = "";
   bool community = false;
 
    ImageData({required this.imagePath,
     required this.date,
-    required this.markerPosition});
+    required this.markerIndex});
 
    String getDate(){
      return date;
    }
-   Offset getMarkerPosition(){
-     return markerPosition;
+   int getMarkerIndex(){
+     return markerIndex;
    }
    String getImagePath(){
      return imagePath;

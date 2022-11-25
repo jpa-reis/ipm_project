@@ -70,7 +70,7 @@ class Timeline extends StatelessWidget {
               TimelineItem(
                 title: 'Boat',
                 subtitle: 'Travel through Oceans',
-                child: Card(child: Image.file(File(images.last.getImagePath()))),
+                child: Card(child: Image.file(File(images[0].last.getImagePath()))),
                 bubbleColor: Colors.grey,
               ),
               const TimelineItem(

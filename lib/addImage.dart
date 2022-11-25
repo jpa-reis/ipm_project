@@ -71,8 +71,9 @@ addImage(bool useCamera, Marker marker,BuildContext context) async{
   if(image == null) return;
   final now = DateTime.now();
   String date = ("${now.hour}:${now.minute} ${now.day}/${now.month}/${now.year}");
-  ImageData i = ImageData(imagePath: image.path,date: date,markerPosition: marker.getPosition());
-  images.add(i);
+  int markerIndex = markers.indexOf(marker);
+  ImageData i = ImageData(imagePath: image.path,date: date,markerIndex: markerIndex);
+  images[markers.indexOf(marker)].add(i);
   await navigator.push(MaterialPageRoute(
       builder: (context) => EditImageScreen( image: i,marker : marker)));
 }
