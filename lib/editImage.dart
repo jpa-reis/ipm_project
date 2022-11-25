@@ -1,9 +1,6 @@
-import 'dart:async';
 import 'dart:io';
-
+import 'marker.dart';
 import 'package:flutter/material.dart';
-
-import 'main.dart';
 
 // A widget that edits a given image.
 class EditImageScreen extends StatefulWidget {

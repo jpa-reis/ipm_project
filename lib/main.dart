@@ -1,9 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ipm_project/globals.dart';
 import 'package:ipm_project/panel_widget.dart';
-import 'white_theme.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:zoom_widget/zoom_widget.dart';
+import 'timeline.dart';
+import 'marker.dart';
+
+// TODO as contas para ver onde colocar o marker estão mal
 
 void main() {
   runApp(const App());
@@ -11,6 +16,7 @@ void main() {
 
 const double buttonSize = 50.0;
 final panelController = PanelController();
+
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -21,7 +27,9 @@ class App extends StatelessWidget {
     return MaterialApp(
         title: 'Time Garden',
         theme: ThemeData(
-          primarySwatch: myWhite,
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.white
+          )
         ),
         home: const HomePage(title: 'Time Garden'));
   }
@@ -37,29 +45,46 @@ class HomePage extends StatefulWidget {
 }
 
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+class _HomePageState extends State<HomePage> {
+
   static const Color iconColor = Color(0xFF383838);
   static const double elevation = 0.7;
   static const double initButtonPosition = buttonSize + 30.0;
   static const Duration fadeTime = Duration(milliseconds: 200);
-  Color transparencyLvl = Colors.white.withOpacity(0.7);
-  double buttonPosition = initButtonPosition;
-  double padding = 15.0;
-  bool panelClosed = true;
-  bool openMapSearch = false;
 
   TextEditingController editingController = TextEditingController();
-  final TransformationController _transformationController =
-    TransformationController();
+  Color transparencyLvl = Colors.white.withOpacity(0.7);
+  double padding = 15.0;
+  Completer<void>? nextButtonCompleter;
 
+  late Offset _globalPosition;
+  late Offset _tapPosition;
+  late double _zoomLvl;
+  late double buttonPosition;
+  late bool panelClosed;
+  late bool openMapSearch;
+
+
+  Future<void> addMarker() async {
+    final completer = Completer<void>();
+    nextButtonCompleter = completer;
+    // This line will wait until onPressed called
+    await completer.future;
+
+    final mPosition = (_tapPosition + _globalPosition)/_zoomLvl;
+    markers.add(Marker(position: mPosition, page: const Timeline(), name: ""));
+  }
 
   @override
   void initState() {
     super.initState();
+    _globalPosition = const Offset(0.0, 0.0);
+    _tapPosition = const Offset(0.0, 0.0);
+    _zoomLvl = 1.0;
     buttonPosition = initButtonPosition;
     panelClosed = true;
+    openMapSearch = false;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -74,44 +99,53 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           alignment: Alignment.topCenter,
           children: <Widget>[
             GestureDetector(
-              onTapDown: (details) => setState(() {
-                openMapSearch = false;
-                var position = details.globalPosition;
-              }),
-              child: InteractiveViewer(
-                transformationController: _transformationController,
-                constrained: false,
-                scaleEnabled: true,
-                minScale: 0.2,
+              onTapDown: (details) {
+                setState(() {
+                  _tapPosition = details.globalPosition;
+                  openMapSearch = false;
+                });
+                nextButtonCompleter?.complete();
+                nextButtonCompleter = null;
+              },
+              child: Zoom(
+                onPositionUpdate: (Offset position) => setState(() {
+                  _globalPosition = position;
+                }),
+                onScaleUpdate: (double scale, double zoom) => setState(() {
+                  _zoomLvl = zoom;
+                }),
+
                 child: Container(
                   width: 4000,
                   height: 2500,
                   decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        fit: BoxFit.fill,
-                        image: AssetImage('lib/jardim.png')
-                    )
+                      image: DecorationImage(
+                          fit: BoxFit.fill,
+                          image: AssetImage('lib/jardim.png')
+                      )
                   ),
                   child: CustomMultiChildLayout(
                     delegate: MapLayout(),
                     children: <Widget>[
                       for (var marker in markers)
                         LayoutId(
-                          id: markers.indexOf(marker),
-                          child: IconButton(
-                            onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => marker.getPage()
-                              ));
-                            },
-                            icon: const Icon(Icons.location_on),
-                          )
+                            id: markers.indexOf(marker),
+                            child: IconButton(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => marker.getPage()
+                                ));
+                              },
+                              icon: const Icon(Icons.location_on),
+                            )
                         )
                     ],
                   ),
                 ),
               ),
             ),
+
+
 
             // WIDGET A COPIAR PARA TER ACESSO AO DRAWER
             SlidingUpPanel(
@@ -229,20 +263,43 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       spacing: 7,
       children: [
         SpeedDialChild(
-            child: const Icon(Icons.search),
-            backgroundColor: transparencyLvl,
-            foregroundColor: iconColor,
-            elevation: elevation,
-            onTap: () => setState(() {
-              openMapSearch = true;
-            }),
+          child: const Icon(Icons.search),
+          backgroundColor: transparencyLvl,
+          foregroundColor: iconColor,
+          elevation: elevation,
+          onTap: () => setState(() {
+            openMapSearch = true;
+          }),
         ),
         SpeedDialChild(
-            child: const Icon(Icons.add),
-            backgroundColor: transparencyLvl,
-            foregroundColor: iconColor,
-            elevation: elevation,
-            onTap: () {},
+          child: const Icon(Icons.add),
+          backgroundColor: transparencyLvl,
+          foregroundColor: iconColor,
+          elevation: elevation,
+          onTap: () => showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              title: const Text("Add a new marker"),
+              content: const Text("Click on the map in the position where"
+                  " you would like to place a new marker."),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, 'OK');
+                    addMarker();
+                  },
+                  style: const ButtonStyle(
+                    foregroundColor: MaterialStatePropertyAll(Color(0xFF484848))
+                  ),
+                  child: const Text('OK')
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'Cancel'),
+                  child: const Text('Cancel')
+                )
+              ],
+            )
+          )
         ),
       ],
     );
@@ -269,28 +326,4 @@ class MapLayout extends MultiChildLayoutDelegate {
     return false;
   }
 
-}
-
-
-class Marker {
-  final Offset position;
-  final Widget page;
-  final String name;
-
-  const Marker({
-    required this.position,
-    required this.page,
-    required this.name
-  });
-
-  Offset getPosition() {
-    return position;
-  }
-
-  Widget getPage() {
-    return page;
-  }
-  String getName(){
-    return name;
-  }
 }

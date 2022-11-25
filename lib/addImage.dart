@@ -1,15 +1,7 @@
-import 'dart:async';
-import 'dart:io';
-
+import 'marker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'editImage.dart';
-import 'main.dart';
-
-
-
-
 
 // a widget that allows users to choose how to add an image
 class AddImageScreen extends StatelessWidget {
