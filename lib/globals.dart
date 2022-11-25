@@ -18,6 +18,6 @@ const List gardens = [
 ];
 
 List<Marker> markers = [
-  const Marker(position: Offset(200.0, 200.0), page: Timeline()),
-  const Marker(position: Offset(1000.0, 200.0), page: Timeline())
+  const Marker(position: Offset(200.0, 200.0), page: Timeline(),name : "Rosa"),
+  const Marker(position: Offset(1000.0, 200.0), page: Timeline(),name : "Cactus")
 ];

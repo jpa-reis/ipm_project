@@ -275,10 +275,13 @@ class MapLayout extends MultiChildLayoutDelegate {
 class Marker {
   final Offset position;
   final Widget page;
+  final String name;
 
   const Marker({
     required this.position,
-    required this.page});
+    required this.page,
+    required this.name
+  });
 
   Offset getPosition() {
     return position;
@@ -286,5 +289,8 @@ class Marker {
 
   Widget getPage() {
     return page;
+  }
+  String getName(){
+    return name;
   }
 }

@@ -30,6 +30,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   bubble_timeline: ^1.0.5
+  image_picker: ^0.8.6
   flutter:
     sdk: flutter
 
@@ -70,6 +71,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - lib/jardim.png
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

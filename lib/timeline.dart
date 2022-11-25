@@ -2,6 +2,9 @@ import 'package:bubble_timeline/bubble_timeline.dart';
 import 'package:bubble_timeline/timeline_item.dart';
 import 'package:flutter/material.dart';
 
+import 'addImage.dart';
+import 'globals.dart';
+
 class Timeline extends StatelessWidget {
   const Timeline({super.key});
 
@@ -113,6 +116,13 @@ class Timeline extends StatelessWidget {
           ),
           Icon(Icons.movie),
         ]),
+        floatingActionButton: FloatingActionButton(
+          onPressed: (){
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => AddImageScreen(marker : markers[0])));
+          },
+          child: const Icon(Icons.add_a_photo)
+        ),
         bottomNavigationBar: const BottomAppBar(
             color: Colors.lightGreen,
             child: Text(
