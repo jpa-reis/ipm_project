@@ -1,3 +1,5 @@
+import 'globals.dart';
+import 'imageData.dart';
 import 'marker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,8 +25,8 @@ class AddImageScreen extends StatelessWidget {
                     children: <Widget>[
                       ElevatedButton(
                         onPressed:() async {
-                          String imagePath = await getImageCamera();
-                          moveToEditImage(context, imagePath, marker);
+                         ImageData image = await addImage(true, marker,context);
+                         //moveToEditImage(context, image, marker);
                         },
                         style: ElevatedButton.styleFrom(
                           shape : const CircleBorder(),
@@ -35,8 +37,8 @@ class AddImageScreen extends StatelessWidget {
                       const SizedBox(width:30),
                       ElevatedButton(
                         onPressed:() async {
-                          String imagePath = await getImageGallery();
-                          moveToEditImage(context, imagePath, marker);
+                          ImageData image = await addImage(false, marker,context);
+                          //moveToEditImage(context, image, marker);
                         },
                         style: ElevatedButton.styleFrom(
                           shape : const CircleBorder(),
@@ -58,19 +60,19 @@ class AddImageScreen extends StatelessWidget {
   }
 }
 
-getImageCamera()async{
-  final image = await ImagePicker().pickImage(source: ImageSource.camera);
+//adds image to images list and moves to edit screen of that image
+addImage(bool useCamera, Marker marker,BuildContext context) async{
+  final navigator = Navigator.of(context);
+  XFile? image;
+  if(useCamera)
+    {image = await ImagePicker().pickImage(source: ImageSource.camera);}
+  else
+    {image = await ImagePicker().pickImage(source: ImageSource.gallery);}
   if(image == null) return;
-  return image.path;
-}
-
-getImageGallery()async{
-  var image = await ImagePicker().pickImage(source: ImageSource.gallery);
-  if(image == null) return;
-  return image.path;
-}
-
-moveToEditImage(context, String imagePath, Marker marker) {
-  Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => EditImageScreen( imagePath: imagePath,marker : marker)));
+  final now = DateTime.now();
+  String date = ("${now.hour}:${now.minute} ${now.day}/${now.month}/${now.year}");
+  ImageData i = ImageData(imagePath: image.path,date: date,markerPosition: marker.getPosition());
+  images.add(i);
+  await navigator.push(MaterialPageRoute(
+      builder: (context) => EditImageScreen( image: i,marker : marker)));
 }

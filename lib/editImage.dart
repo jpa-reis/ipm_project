@@ -1,16 +1,14 @@
 import 'dart:io';
+import 'imageData.dart';
 import 'marker.dart';
 import 'package:flutter/material.dart';
 
 // A widget that edits a given image.
 class EditImageScreen extends StatefulWidget {
-  final String imagePath;
-  final String imageDate = "24/11/2022";
-  final String imageDescription = "This is a rose";
+  final ImageData image;
   final Marker marker;
-  final bool community = false;
 
-  const EditImageScreen({super.key, required this.imagePath, required this.marker});
+  const EditImageScreen({super.key, required this.image, required this.marker});
 
   @override
   State<StatefulWidget> createState() {
@@ -19,9 +17,9 @@ class EditImageScreen extends StatefulWidget {
 }
 
 class EditImageState extends State<EditImageScreen> {
-  late bool communitySwitch= widget.community;
+  late bool communitySwitch= widget.image.getCommunity();
 
-  late TextEditingController descriptionController = TextEditingController(text: widget.imageDescription);
+  late TextEditingController descriptionController = TextEditingController(text: widget.image.getDescription());
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +33,7 @@ class EditImageState extends State<EditImageScreen> {
               Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text(widget.imageDate),
+                    Text(widget.image.date),
                     const SizedBox(width: 60),
                     const Text("Community:"),
                     Switch(
@@ -57,14 +55,15 @@ class EditImageState extends State<EditImageScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              Flexible(child: Card(child: Image.file(File(widget.imagePath)))),
+              Flexible(child: Card(child: Image.file(File(widget.image.getImagePath())))),
               const SizedBox(height: 20),
             ]
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          saveImageInfo(descriptionController.text, communitySwitch);
+          widget.image.setDescription(descriptionController.text);
+          widget.image.setCommunity(communitySwitch);
           moveToTimeline(context,widget.marker);
         },
         backgroundColor: Colors.green,
@@ -81,11 +80,10 @@ class EditImageState extends State<EditImageScreen> {
   }
 }
 
-saveImageInfo(String description,bool community){
-  //TODO
-}
-
 moveToTimeline(context,Marker marker){
   Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => marker.getPage()));
+}
+moveBack(context){
+  Navigator.pop(context);
 }

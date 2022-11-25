@@ -1,6 +1,7 @@
 library my_prj.globals;
 
 import 'package:flutter/material.dart';
+import 'imageData.dart';
 import 'main.dart';
 import 'timeline.dart';
 import 'marker.dart';
@@ -22,3 +23,5 @@ List<Marker> markers = [
   const Marker(position: Offset(200.0, 200.0), page: Timeline(), name: ""),
   const Marker(position: Offset(54.75, 200.0), page: Timeline(), name: "")
 ];
+
+final images = <ImageData>[];

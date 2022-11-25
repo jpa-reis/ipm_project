@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bubble_timeline/bubble_timeline.dart';
 import 'package:bubble_timeline/timeline_item.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +62,7 @@ class Timeline extends StatelessWidget {
             ),
           ),
         ),
-        body: const TabBarView(children: [
+        body: TabBarView(children: [
           BubbleTimeline(
             bubbleDiameter: 120,
             // List of Timeline Bubble Items
@@ -68,13 +70,10 @@ class Timeline extends StatelessWidget {
               TimelineItem(
                 title: 'Boat',
                 subtitle: 'Travel through Oceans',
-                child: Icon(
-                  Icons.directions_boat,
-                  color: Colors.white,
-                ),
+                child: Card(child: Image.file(File(images.last.getImagePath()))),
                 bubbleColor: Colors.grey,
               ),
-              TimelineItem(
+              const TimelineItem(
                 title: 'Bike',
                 subtitle: 'Road Trips are best',
                 child: Icon(
@@ -83,7 +82,7 @@ class Timeline extends StatelessWidget {
                 ),
                 bubbleColor: Colors.grey,
               ),
-              TimelineItem(
+              const TimelineItem(
                 title: 'Bus',
                 subtitle: 'I like to go with friends',
                 child: Icon(
@@ -92,7 +91,7 @@ class Timeline extends StatelessWidget {
                 ),
                 bubbleColor: Colors.grey,
               ),
-              TimelineItem(
+              const TimelineItem(
                 title: 'Bus',
                 subtitle: 'I like to go with friends',
                 child: Icon(
@@ -101,7 +100,7 @@ class Timeline extends StatelessWidget {
                 ),
                 bubbleColor: Colors.grey,
               ),
-              TimelineItem(
+              const TimelineItem(
                 title: 'Bus',
                 subtitle: 'I like to go with friends',
                 child: Icon(
@@ -114,7 +113,7 @@ class Timeline extends StatelessWidget {
             stripColor: Colors.teal,
             scaffoldColor: Colors.white,
           ),
-          Icon(Icons.movie),
+          const Icon(Icons.movie),
         ]),
         floatingActionButton: FloatingActionButton(
           onPressed: (){
