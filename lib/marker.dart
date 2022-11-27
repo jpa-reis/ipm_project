@@ -7,12 +7,7 @@ class Marker {
 
   const Marker({
     required this.position,
-    required this.name});
+    required this.name
+  });
 
-  Offset getPosition() {
-    return position;
-  }
-  String getName() {
-    return name;
-  }
 }

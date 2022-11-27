@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'gardens.dart';
 import 'globals.dart';
 
 class PanelWidget extends StatefulWidget {
@@ -17,13 +18,13 @@ class PanelWidget extends StatefulWidget {
 }
 
 class _PanelWidgetState extends State<PanelWidget> {
-  TextEditingController editingController = TextEditingController();
-
+  final textController = TextEditingController();
+  List<Garden> gardenOptions = gardens;
 
   void togglePanel() => widget.panelController.isPanelOpen
       ? widget.panelController.close()
-      : widget.panelController.open()
-  ;
+      : widget.panelController.open();
+
 
   Widget buildHandle() {
     return GestureDetector(
@@ -39,6 +40,17 @@ class _PanelWidgetState extends State<PanelWidget> {
         ),
       )
     );
+  }
+
+  void searchGarden(String query) {
+    final suggestions = gardens.where((garden) {
+      final gardenName = garden.name.toLowerCase();
+      final searchQuery = query.toLowerCase();
+
+      return gardenName.contains(searchQuery);
+    }).toList();
+
+    setState(() => gardenOptions = suggestions);
   }
 
 
@@ -62,22 +74,24 @@ class _PanelWidgetState extends State<PanelWidget> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextField(
-            controller: editingController,
+            controller: textController,
             decoration: const InputDecoration(
                 hintText: "Search",
                 prefixIcon: Icon(Icons.search),
             ),
+            onChanged: searchGarden,
           )
         ),
         ListView.builder(
           shrinkWrap: true,
-          itemCount: 3,
-          itemBuilder: (BuildContext context, int index) {
+          itemCount: gardenOptions.length,
+          itemBuilder: (context, index) {
+            final garden = gardenOptions[index];
             return ListTile(
-              title: Text(gardens[index]['title']),
+              title: Text(garden.name),
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => gardens[index]['navigate']
+                    builder: (context) => garden.page
                 ));
               }
             );
@@ -88,7 +102,3 @@ class _PanelWidgetState extends State<PanelWidget> {
   }
 
 }
-/**onTap: () {
-Navigator.of(context).push(MaterialPageRoute(
-builder: (context) => marker.getPage()
-));**/

@@ -17,6 +17,7 @@ void main() {
 
 const double buttonSize = 50.0;
 final panelController = PanelController();
+List<Marker> currentMarkers = markers;
 
 
 class App extends StatelessWidget {
@@ -56,7 +57,7 @@ class _HomePageState extends State<HomePage> {
 
   static const double initButtonPosition = buttonSize + 30.0;
   static const Duration fadeTime = Duration(milliseconds: 200);
-  TextEditingController editingController = TextEditingController();
+  final editingController = TextEditingController();
   double padding = 15.0;
   Completer<void>? nextButtonCompleter;
 
@@ -67,7 +68,6 @@ class _HomePageState extends State<HomePage> {
   late bool panelClosed;
   late bool openMapSearch;
 
-
   Future<void> addMarker() async {
     final completer = Completer<void>();
     nextButtonCompleter = completer;
@@ -75,8 +75,21 @@ class _HomePageState extends State<HomePage> {
     await completer.future;
 
     final mPosition = (_tapPosition + _globalPosition)/_zoomLvl;
-    markers.add(Marker(position: mPosition, name: ""));
+    var newMarker = Marker(position: mPosition, name: '');
+    markers.add(newMarker);
+    currentMarkers.add(newMarker);
     images.add(<ImageData>[]);
+  }
+
+  void searchMarker(String query) {
+    final suggestions = markers.where((marker) {
+      final markerName = marker.name.toLowerCase();
+      final searchQuery = query.toLowerCase();
+
+      return markerName.contains(searchQuery);
+    }).toList();
+
+    setState(() => currentMarkers = suggestions);
   }
 
   @override
@@ -131,36 +144,37 @@ class _HomePageState extends State<HomePage> {
                   child: CustomMultiChildLayout(
                     delegate: MapLayout(),
                     children: <Widget>[
-                      for (var marker in markers)
+                      for (var marker in currentMarkers)
                         LayoutId(
-                            id: markers.indexOf(marker),
-                            child: SizedBox.fromSize(
-                              size: Size(106, 106),
-                              child: ClipOval(
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    splashColor: Colors.grey[600],
-                                    onTap: () {
-                                      Navigator.of(context).push(MaterialPageRoute(
-                                          builder: (context) => AddImageScreen(marker: marker)
-                                      ));
-                                    },
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: const <Widget>[
-                                        Icon(
-                                          Icons.location_on,
-                                          size: 40.0,
-                                          color: iconColor,
-                                        ), // <-- Icon
-                                        Text("Name"), // <-- Text
-                                      ],
-                                    ),
+                          id: markers.indexOf(marker),
+                          child: SizedBox.fromSize(
+                            size: Size(106, 106),
+                            child: ClipOval(
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  splashColor: Colors.grey[600],
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context)
+                                         => AddImageScreen(marker: marker)
+                                    ));
+                                  },
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.location_on,
+                                        size: 40.0,
+                                        color: iconColor,
+                                      ), // <-- Icon
+                                      Text(marker.name), // <-- Text
+                                    ],
                                   ),
                                 ),
                               ),
-                            )
+                            ),
+                          )
                         )
                     ],
                   ),
@@ -196,20 +210,20 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.all(20.0),
                   child: TextField(
                     controller: editingController,
-                    decoration: const InputDecoration(
-                      hintText: "Search",
-                      prefixIcon: Icon(
+                    decoration: InputDecoration(
+                      hintText: "Search marker",
+                      prefixIcon: const Icon(
                         Icons.search,
                         color: iconColor,
                       ),
                       filled: true,
                       fillColor: Colors.white,
-                      border: OutlineInputBorder(
+                      border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(
-                              Radius.circular(25.0)
-                          )
+                              Radius.circular(25.0))
                       )
                     ),
+                    onChanged: searchMarker,
                   ),
                 ),
               ),
@@ -336,9 +350,9 @@ class MapLayout extends MultiChildLayoutDelegate {
 
   @override
   void performLayout(Size size) {
-    for (final marker in markers) {
+    for (final marker in currentMarkers) {
       layoutChild(markers.indexOf(marker), constraints);
-      positionChild(markers.indexOf(marker), marker.getPosition());
+      positionChild(markers.indexOf(marker), marker.position);
     }
   }
 

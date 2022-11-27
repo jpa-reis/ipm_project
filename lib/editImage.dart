@@ -74,7 +74,7 @@ class EditImageState extends State<EditImageScreen> {
       bottomNavigationBar: BottomAppBar(
           color: Colors.lightGreen,
           child: Text(
-            widget.marker.getName(),
+            widget.marker.name,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 25, color: Colors.white),
           )),
