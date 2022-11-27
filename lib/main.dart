@@ -48,13 +48,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  // BUTTONS
   static const Color iconColor = Color(0xFF383838);
   static const double elevation = 0;
+  Color transparencyLvl = Colors.white.withOpacity(0.8);
+
+
   static const double initButtonPosition = buttonSize + 30.0;
   static const Duration fadeTime = Duration(milliseconds: 200);
-
   TextEditingController editingController = TextEditingController();
-  Color transparencyLvl = Colors.white.withOpacity(0.8);
   double padding = 15.0;
   Completer<void>? nextButtonCompleter;
 
@@ -132,13 +134,32 @@ class _HomePageState extends State<HomePage> {
                       for (var marker in markers)
                         LayoutId(
                             id: markers.indexOf(marker),
-                            child: IconButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => AddImageScreen(marker: marker)
-                                ));
-                              },
-                              icon: const Icon(Icons.location_on),
+                            child: SizedBox.fromSize(
+                              size: Size(106, 106),
+                              child: ClipOval(
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    splashColor: Colors.grey[600],
+                                    onTap: () {
+                                      Navigator.of(context).push(MaterialPageRoute(
+                                          builder: (context) => AddImageScreen(marker: marker)
+                                      ));
+                                    },
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: const <Widget>[
+                                        Icon(
+                                          Icons.location_on,
+                                          size: 40.0,
+                                          color: iconColor,
+                                        ), // <-- Icon
+                                        Text("Name"), // <-- Text
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
                             )
                         )
                     ],
@@ -146,8 +167,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-
-
 
             // WIDGET A COPIAR PARA TER ACESSO AO DRAWER
             SlidingUpPanel(
@@ -311,8 +330,8 @@ class _HomePageState extends State<HomePage> {
 
 class MapLayout extends MultiChildLayoutDelegate {
   final constraints = const BoxConstraints(
-      maxHeight: 50.0,
-      maxWidth: 50.0
+      maxHeight: 100.0,
+      maxWidth: 100.0
   );
 
   @override
