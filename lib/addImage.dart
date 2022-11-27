@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'globals.dart';
 import 'imageData.dart';
 import 'marker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'editImage.dart';
+import 'timeline.dart';
 
 // a widget that allows users to choose how to add an image
 class AddImageScreen extends StatelessWidget {
@@ -26,6 +29,8 @@ class AddImageScreen extends StatelessWidget {
                       ElevatedButton(
                         onPressed:() async {
                          ImageData image = await addImage(true, marker,context);
+                         final navigator = Navigator.of(context);
+
                          //moveToEditImage(context, image, marker);
                         },
                         style: ElevatedButton.styleFrom(
@@ -38,6 +43,7 @@ class AddImageScreen extends StatelessWidget {
                       ElevatedButton(
                         onPressed:() async {
                           ImageData image = await addImage(false, marker,context);
+
                           //moveToEditImage(context, image, marker);
                         },
                         style: ElevatedButton.styleFrom(
@@ -70,10 +76,10 @@ addImage(bool useCamera, Marker marker,BuildContext context) async{
     {image = await ImagePicker().pickImage(source: ImageSource.gallery);}
   if(image == null) return;
   final now = DateTime.now();
-  String date = ("${now.hour}:${now.minute} ${now.day}/${now.month}/${now.year}");
+  String date = ("${now.day}/${now.month}");
   int markerIndex = markers.indexOf(marker);
   ImageData i = ImageData(imagePath: image.path,date: date,markerIndex: markerIndex);
   images[markers.indexOf(marker)].add(i);
-  await navigator.push(MaterialPageRoute(
-      builder: (context) => EditImageScreen( image: i,marker : marker)));
+  navigator.push(MaterialPageRoute(
+      builder: (context) => EditImageScreen(image: i, marker: marker,)));
 }

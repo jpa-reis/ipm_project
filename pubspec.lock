@@ -15,13 +15,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
-  bubble_timeline:
-    dependency: "direct main"
-    description:
-      name: bubble_timeline
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.5"
   characters:
     dependency: transitive
     description:
@@ -252,6 +245,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.12"
+  timeline_tile:
+    dependency: "direct main"
+    description:
+      name: timeline_tile
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   toggle_switch:
     dependency: "direct main"
     description:

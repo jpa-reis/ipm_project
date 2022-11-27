@@ -1,8 +1,10 @@
+import 'dart:developer';
 import 'dart:io';
 import 'imageData.dart';
 import 'marker.dart';
 import 'package:flutter/material.dart';
-
+import 'timeline.dart';
+import 'globals.dart';
 // A widget that edits a given image.
 class EditImageScreen extends StatefulWidget {
   final ImageData image;
@@ -80,9 +82,10 @@ class EditImageState extends State<EditImageScreen> {
   }
 }
 
+
 moveToTimeline(context,Marker marker){
   Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => marker.getPage()));
+      builder: (context) => Timeline(indexOf: markers.indexOf(marker))));
 }
 moveBack(context){
   Navigator.pop(context);

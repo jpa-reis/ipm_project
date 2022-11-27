@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:ipm_project/addImage.dart';
 import 'package:ipm_project/globals.dart';
 import 'package:ipm_project/panel_widget.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -7,7 +8,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:zoom_widget/zoom_widget.dart';
 import 'timeline.dart';
 import 'marker.dart';
-
+import 'imageData.dart';
 // TODO as contas para ver onde colocar o marker estão mal
 
 void main() {
@@ -48,12 +49,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   static const Color iconColor = Color(0xFF383838);
-  static const double elevation = 0.7;
+  static const double elevation = 0;
   static const double initButtonPosition = buttonSize + 30.0;
   static const Duration fadeTime = Duration(milliseconds: 200);
 
   TextEditingController editingController = TextEditingController();
-  Color transparencyLvl = Colors.white.withOpacity(0.7);
+  Color transparencyLvl = Colors.white.withOpacity(0.8);
   double padding = 15.0;
   Completer<void>? nextButtonCompleter;
 
@@ -72,7 +73,8 @@ class _HomePageState extends State<HomePage> {
     await completer.future;
 
     final mPosition = (_tapPosition + _globalPosition)/_zoomLvl;
-    markers.add(Marker(position: mPosition, page: const Timeline(), name: ""));
+    markers.add(Marker(position: mPosition, name: ""));
+    images.add(<ImageData>[]);
   }
 
   @override
@@ -133,7 +135,7 @@ class _HomePageState extends State<HomePage> {
                             child: IconButton(
                               onPressed: () {
                                 Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => marker.getPage()
+                                    builder: (context) => AddImageScreen(marker: marker)
                                 ));
                               },
                               icon: const Icon(Icons.location_on),
