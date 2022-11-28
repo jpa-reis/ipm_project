@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:intl/intl.dart';
 import 'package:ipm_project/panel_widget.dart';
 import 'package:ipm_project/panel_widget_timeline.dart';
 import 'package:ipm_project/show_photo.dart';
@@ -103,13 +104,14 @@ class _TimelineState extends State<Timeline> {
                   ),
                   Container(
                     color: Colors.white,
-                    child: ListView(children: createTimeline()),
+                    child: ListView(children: createTimeLineCommunity()),
                   ),
                 ]),
               ),
             ),
           ),
           SlidingUpPanel(
+            color: Color(0xFF75A889),
             controller: panelController,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
             maxHeight: panelHeightOpen,
@@ -128,6 +130,77 @@ class _TimelineState extends State<Timeline> {
             }),
           ),
         ]));
+  }
+  createTimeLineCommunity(){
+    orderCommunity();
+    List<Widget> list = <Widget>[];
+    int i = 0;
+
+    if(currentGarden == 1 && community1[markers1.indexOf(widget.marker)].isEmpty){
+      return list;
+    }
+    else if(currentGarden == 2 && community2[markers2.indexOf(widget.marker)].isEmpty){
+      return list;
+    }
+    list.add(startingTimeline());
+
+    if (currentGarden == 1) {
+      while (i < community1[indexOf].length) {
+        if (i % 2 == 0 && i == 0) {
+          list.add(evenTimelineCommunity(i));
+        } else if (i % 2 == 0) {
+          list.add(addDivider());
+          list.add(evenTimelineCommunity(i));
+        } else {
+          list.add(addDivider());
+          list.add(oddTimelineCommunity(i));
+        }
+        i++;
+      }
+    } else {
+      while (i < community2[indexOf].length) {
+        if (i % 2 == 0 && i == 0) {
+          list.add(evenTimelineCommunity(i));
+        } else if (i % 2 == 0) {
+          list.add(addDivider());
+          list.add(evenTimelineCommunity(i));
+        } else {
+          list.add(addDivider());
+          list.add(oddTimelineCommunity(i));
+        }
+        i++;
+      }
+    }
+
+    if (i % 2 == 0) {
+      list.add(lastTimelineEven());
+    } else {
+      list.add(lastTimelineOdd());
+    }
+
+    list.add(SizedBox(width: 300,));
+    return list;
+  }
+
+  orderCommunity(){
+    if(currentGarden == 1){
+      int i = 0;
+      while(i < community1[indexOf].length){
+        community1[i].sort((photo1, photo2){
+          return photo1.date.compareTo(photo2.date);
+        });
+        i++;
+      }
+    }
+    else{
+      int i = 0;
+      while(i < community2[indexOf].length){
+        community2[i].sort((photo1, photo2){
+          return photo1.date.compareTo(photo2.date);
+        });
+        i++;
+      }
+    }
   }
 
   createTimeline() {
@@ -257,8 +330,8 @@ class _TimelineState extends State<Timeline> {
           child: Center(
             child: Text(
               (currentGarden == 1)
-                  ? images1[indexOf][i].date
-                  : images2[indexOf][i].date,
+                  ? DateFormat('MM-dd').format(images1[indexOf][i].date)
+                  : DateFormat('MM-dd').format(images2[indexOf][i].date),
               style: TextStyle(
                   fontWeight: FontWeight.bold, color: Color(0xFF618A3D)),
             ),
@@ -316,6 +389,88 @@ class _TimelineState extends State<Timeline> {
     );
   }
 
+  Widget evenTimelineCommunity(int i) {
+    return TimelineTile(
+      beforeLineStyle: LineStyle(
+        color: Color(0xFF618A3D),
+        thickness: 3,
+      ),
+      indicatorStyle: IndicatorStyle(
+        drawGap: true,
+        width: 50,
+        height: 50,
+        color: Colors.purple,
+        padding: const EdgeInsets.all(8),
+        indicator: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Color(0xFF618A3D),
+              width: 3,
+            ),
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Text(
+                (currentGarden == 1)
+                    ? DateFormat('MM-dd').format(images1[indexOf][i].date)
+                    : DateFormat('MM-dd').format(images2[indexOf][i].date),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, color: Color(0xFF618A3D)),
+            ),
+          ),
+        ),
+      ),
+      alignment: TimelineAlign.manual,
+      lineXY: 0.15,
+      endChild: Padding(
+        padding: const EdgeInsets.only(
+            left: 40.0, right: 30.0, top: 30.0, bottom: 30.0),
+        child: Column(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: GestureDetector(
+                onTap: () {
+                  if (currentGarden == 1) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ShowPhoto(
+                            image: community1[indexOf][i],
+                            marker: markers1[indexOf],
+                            indexOf: indexOf,
+                            i: i,
+                            currentGarden: currentGarden)));
+                  } else {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ShowPhoto(
+                            image: community2[indexOf][i],
+                            marker: markers2[indexOf],
+                            indexOf: indexOf,
+                            i: i,
+                            currentGarden: currentGarden)));
+                  }
+                },
+                child: (currentGarden == 1)
+                    ? Image.file(File(community1[indexOf][i].imagePath))
+                    : Image.file(File(community2[indexOf][i].imagePath),
+                    width: 300, height: 200, fit: BoxFit.cover),
+              ),
+            ),
+            Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: (currentGarden == 1)
+                      ? Text(community1[indexOf][i].description)
+                      : Text(community2[indexOf][i].description),
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget oddTimeline(int i) {
     return TimelineTile(
       beforeLineStyle: LineStyle(
@@ -339,8 +494,8 @@ class _TimelineState extends State<Timeline> {
           child: Center(
             child: Text(
               (currentGarden == 1)
-                  ? images1[indexOf][i].date
-                  : images2[indexOf][i].date,
+                  ? DateFormat('MM-dd').format(images1[indexOf][i].date)
+                  : DateFormat('MM-dd').format(images2[indexOf][i].date),
               style: TextStyle(
                   fontWeight: FontWeight.bold, color: Color(0xFF618A3D)),
             ),
@@ -398,6 +553,88 @@ class _TimelineState extends State<Timeline> {
     );
   }
 
+  Widget oddTimelineCommunity(int i) {
+    return TimelineTile(
+      beforeLineStyle: LineStyle(
+        color: Color(0xFF618A3D),
+        thickness: 3,
+      ),
+      indicatorStyle: IndicatorStyle(
+        drawGap: true,
+        width: 50,
+        height: 50,
+        color: Colors.purple,
+        padding: const EdgeInsets.all(8),
+        indicator: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Color(0xFF618A3D),
+              width: 3,
+            ),
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Text(
+              (currentGarden == 1)
+                  ? DateFormat('MM-dd').format(images1[indexOf][i].date)
+                  : DateFormat('MM-dd').format(images2[indexOf][i].date),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, color: Color(0xFF618A3D)),
+            ),
+          ),
+        ),
+      ),
+      alignment: TimelineAlign.manual,
+      lineXY: 0.85,
+      startChild: Padding(
+        padding: const EdgeInsets.only(
+            left: 40.0, right: 30.0, top: 30.0, bottom: 30.0),
+        child: Column(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: GestureDetector(
+                onTap: () {
+                  if (currentGarden == 1) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ShowPhoto(
+                            image: community1[indexOf][i],
+                            marker: markers1[indexOf],
+                            indexOf: indexOf,
+                            i: i,
+                            currentGarden: currentGarden)));
+                  } else {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ShowPhoto(
+                            image: community2[indexOf][i],
+                            marker: markers2[indexOf],
+                            indexOf: indexOf,
+                            i: i,
+                            currentGarden: currentGarden)));
+                  }
+                },
+                child: (currentGarden == 1)
+                    ? Image.file(File(community1[indexOf][i].imagePath))
+                    : Image.file(File(community2[indexOf][i].imagePath),
+                    width: 300, height: 200, fit: BoxFit.cover),
+              ),
+            ),
+            Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: (currentGarden == 1)
+                      ? Text(community1[indexOf][i].description)
+                      : Text(community2[indexOf][i].description),
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget lastTimelineOdd() {
     return TimelineTile(
       beforeLineStyle: LineStyle(
@@ -428,6 +665,10 @@ class _TimelineState extends State<Timeline> {
 
   Widget lastTimelineEven() {
     return TimelineTile(
+      beforeLineStyle: LineStyle(
+        color: Color(0xFF618A3D),
+        thickness: 3,
+      ),
       afterLineStyle: LineStyle(
         color: Color(0xFF618A3D),
         thickness: 3,
@@ -471,10 +712,9 @@ addImage(bool useCamera, Marker marker, BuildContext context) async {
   }
   if (image == null) return;
   final now = DateTime.now();
-  String date = ("${now.day}/${now.month}");
   int markerIndex = markers1.indexOf(marker);
   ImageData i =
-  ImageData(imagePath: image.path, date: date, markerIndex: markerIndex);
+  ImageData(imagePath: image.path, date: now, markerIndex: markerIndex);
   if (currentGarden == 1) {
     images1[markers1.indexOf(marker)].add(i);
   } else {

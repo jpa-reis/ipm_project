@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 
 class ImageData{
-  final String date;
+  final DateTime date;
   final int markerIndex;
   final String imagePath;
   String description = "";
@@ -13,7 +13,7 @@ class ImageData{
     required this.date,
     required this.markerIndex});
 
-   String getDate(){
+   DateTime getDate(){
      return date;
    }
    int getMarkerIndex(){

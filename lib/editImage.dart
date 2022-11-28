@@ -1,6 +1,8 @@
 import 'dart:developer';
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:ui';
+import 'package:intl/intl.dart';
 import 'package:ipm_project/main.dart';
 
 import 'imageData.dart';
@@ -32,7 +34,7 @@ class EditImageState extends State<EditImageScreen> {
   Widget build(BuildContext context) {
     final bottomBarHeight = MediaQuery.of(context).size.height * 0.1;
     return Scaffold(
-      backgroundColor: Colors.grey,
+      backgroundColor: Color(0xFF75A889),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
       body: SingleChildScrollView(
@@ -69,7 +71,7 @@ class EditImageState extends State<EditImageScreen> {
               Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text(widget.image.date),
+                    Text(DateFormat('MM-dd').format(widget.image.date)),
                     const SizedBox(width: 60),
                     const Text("Community:"),
                     Switch(
@@ -89,6 +91,22 @@ class EditImageState extends State<EditImageScreen> {
         onPressed: (){
           widget.image.setDescription(descriptionController.text);
           widget.image.setCommunity(communitySwitch);
+          if(communitySwitch){
+            if(currentGarden == 1){
+              community1[markers1.indexOf(widget.marker)].add(widget.image);
+            }
+            else{
+              community2[markers2.indexOf(widget.marker)].add(widget.image);
+            }
+          }
+          else{
+            if(currentGarden == 1){
+              community1[markers1.indexOf(widget.marker)].remove(widget.image);
+            }
+            else{
+              community2[markers2.indexOf(widget.marker)].remove(widget.image);
+            }
+          }
           moveToTimeline(context,widget.marker);
         },
         backgroundColor: Colors.green,
@@ -96,7 +114,7 @@ class EditImageState extends State<EditImageScreen> {
       ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color:Color(0xFF75A889),
             borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
             boxShadow: const [
               BoxShadow(color: Colors.black38, spreadRadius: 0, blurRadius: 10),

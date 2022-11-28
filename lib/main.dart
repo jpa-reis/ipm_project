@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
   static const double elevation = 0;
   static const double buttonSize = 50.0;
   static const double markerSize = 50.0;
-  Color transparencyLvl = Color(0xff51983c).withOpacity(0.7);
+  Color transparencyLvl =Color(0xFF75A889).withOpacity(0.7);
   // -------------------------------------------------------
 
   static const double initButtonPosition = buttonSize + 30.0;
@@ -93,9 +93,11 @@ class _HomePageState extends State<HomePage> {
 
     if (currentGarden == 1) {
       markers1.add(newMarker);
+      community1.add(<ImageData>[]);
     }
     else {
       markers2.add(newMarker);
+      community2.add(<ImageData>[]);
     }
     (currentGarden == 1) ? images1.add(<ImageData>[]) : images2.add(<ImageData>[]);
   }

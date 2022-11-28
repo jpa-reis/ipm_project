@@ -19,6 +19,7 @@ class AddImageScreen extends StatelessWidget {
   Widget build(BuildContext context){
     final bottomBarHeight = MediaQuery.of(context).size.height * 0.1;
     return Scaffold(
+      backgroundColor: Color(0xFF65a765),
       body: Center(
           child : Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -59,7 +60,7 @@ class AddImageScreen extends StatelessWidget {
       ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Color(0xFF75A889),
             borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
             boxShadow: const [
               BoxShadow(color: Colors.black38, spreadRadius: 0, blurRadius: 10),
@@ -85,9 +86,8 @@ addImage(bool useCamera, Marker marker,BuildContext context) async{
     {image = await ImagePicker().pickImage(source: ImageSource.gallery);}
   if(image == null) return;
   final now = DateTime.now();
-  String date = ("${now.day}/${now.month}");
   int markerIndex = markers1.indexOf(marker);
-  ImageData i = ImageData(imagePath: image.path,date: date,markerIndex: markerIndex);
+  ImageData i = ImageData(imagePath: image.path,date: now,markerIndex: markerIndex);
   if(currentGarden == 1){
     images1[markers1.indexOf(marker)].add(i);
   }
