@@ -16,6 +16,7 @@ class AddImageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context){
+    final bottomBarHeight = MediaQuery.of(context).size.height * 0.1;
     return Scaffold(
       body: Center(
           child : Column(
@@ -55,13 +56,20 @@ class AddImageScreen extends StatelessWidget {
                     ]),
               ])
       ),
-      bottomNavigationBar: BottomAppBar(
-          color: Colors.lightGreen,
-          child: Text(
-            marker.name,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 25, color: Colors.white),
-          )),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+            boxShadow: const [
+              BoxShadow(color: Colors.black38, spreadRadius: 0, blurRadius: 10),
+            ],
+          ),
+          height: bottomBarHeight,
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(marker.name,style: TextStyle(fontSize: 25, color: Colors.black))
+          ),
+        )
     );
   }
 }

@@ -7,10 +7,10 @@ import 'timeline.dart';
 import 'globals.dart';
 // A widget that edits a given image.
 class EditImageScreen extends StatefulWidget {
-  final ImageData image;
-  final Marker marker;
 
   const EditImageScreen({super.key, required this.image, required this.marker});
+  final ImageData image;
+  final Marker marker;
 
   @override
   State<StatefulWidget> createState() {
@@ -25,6 +25,7 @@ class EditImageState extends State<EditImageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bottomBarHeight = MediaQuery.of(context).size.height * 0.1;
     return Scaffold(
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
@@ -71,13 +72,20 @@ class EditImageState extends State<EditImageScreen> {
         backgroundColor: Colors.green,
         child: const Icon(Icons.save),
       ),
-      bottomNavigationBar: BottomAppBar(
-          color: Colors.lightGreen,
-          child: Text(
-            widget.marker.name,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 25, color: Colors.white),
-          )),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+            boxShadow: const [
+              BoxShadow(color: Colors.black38, spreadRadius: 0, blurRadius: 10),
+            ],
+          ),
+          height: bottomBarHeight,
+          child: Align(
+              alignment: Alignment.center,
+              child: Text(widget.marker.name,style: TextStyle(fontSize: 25, color: Colors.black))
+          ),
+        )
     );
   }
 }
