@@ -20,8 +20,8 @@ const List<Garden> gardens = [
 ];
 
 List<Marker> markers = [
-  const Marker(position: Offset(200.0, 200.0), name: "Rose"),
-  const Marker(position: Offset(54.75, 200.0), name: "Tree")
+  const Marker(position: Offset(200.0, 200.0), name: "Rose", id: 0),
+  const Marker(position: Offset(54.75, 200.0), name: "Tree", id: 1)
 ];
 
 final images = <List<ImageData>>[<ImageData>[], <ImageData>[], <ImageData>[]];

@@ -5,19 +5,12 @@ import 'package:ipm_project/globals.dart';
 import 'package:ipm_project/panel_widget.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:zoom_widget/zoom_widget.dart';
-import 'timeline.dart';
 import 'marker.dart';
 import 'imageData.dart';
-// TODO as contas para ver onde colocar o marker estão mal
 
 void main() {
   runApp(const App());
 }
-
-const double buttonSize = 50.0;
-final panelController = PanelController();
-List<Marker> currentMarkers = markers;
 
 
 class App extends StatelessWidget {
@@ -31,6 +24,14 @@ class App extends StatelessWidget {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.white
+          ),
+          snackBarTheme: SnackBarThemeData(
+            actionTextColor: Colors.white
+          ),
+          textButtonTheme: TextButtonThemeData(
+            style: ButtonStyle(
+              foregroundColor: MaterialStatePropertyAll(Colors.grey[800])
+            )
           )
         ),
         home: const HomePage(title: 'Time Garden'));
@@ -47,40 +48,51 @@ class HomePage extends StatefulWidget {
 }
 
 
+
+
 class _HomePageState extends State<HomePage> {
 
-  // BUTTONS
+  // -------------------------------------------------------- BUTTONS
   static const Color iconColor = Color(0xFF383838);
   static const double elevation = 0;
+  static const double buttonSize = 50.0;
+  static const double markerSize = 50.0;
   Color transparencyLvl = Colors.white.withOpacity(0.8);
-
+  // -------------------------------------------------------
 
   static const double initButtonPosition = buttonSize + 30.0;
   static const Duration fadeTime = Duration(milliseconds: 200);
-  final editingController = TextEditingController();
+  final newMarkerController = TextEditingController();
+  final searchMarkerController = TextEditingController();
+  FocusNode focusNode = FocusNode();
   double padding = 15.0;
   Completer<void>? nextButtonCompleter;
 
-  late Offset _globalPosition;
+  final panelController = PanelController();
+  final transformationController = TransformationController();
   late Offset _tapPosition;
-  late double _zoomLvl;
   late double buttonPosition;
   late bool panelClosed;
   late bool openMapSearch;
 
-  Future<void> addMarker() async {
+  Future<void> addMarker(String markerName) async {
     final completer = Completer<void>();
     nextButtonCompleter = completer;
     // This line will wait until onPressed called
     await completer.future;
 
-    final mPosition = (_tapPosition + _globalPosition)/_zoomLvl;
-    var newMarker = Marker(position: mPosition, name: '');
+    final mPosition = _tapPosition;
+    var newMarker = Marker(
+        position: mPosition,
+        name: markerName,
+        id: markers.length
+    );
+    print("IM HERE");
     markers.add(newMarker);
-    currentMarkers.add(newMarker);
     images.add(<ImageData>[]);
   }
 
+  late List<Marker> currentMarkers;
   void searchMarker(String query) {
     final suggestions = markers.where((marker) {
       final markerName = marker.name.toLowerCase();
@@ -94,14 +106,17 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    super.initState();
-    _globalPosition = const Offset(0.0, 0.0);
+    transformationController.value = Matrix4.identity();
+    transformationController.value.translate(-200.0, 0.0);
+
+    currentMarkers = markers;
     _tapPosition = const Offset(0.0, 0.0);
-    _zoomLvl = 1.0;
     buttonPosition = initButtonPosition;
     panelClosed = true;
     openMapSearch = false;
+    super.initState();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -110,28 +125,43 @@ class _HomePageState extends State<HomePage> {
     padding = MediaQuery.of(context).size.height * 0.02;
     buttonPosition = panelHeightClosed + padding;
 
+    print("MARKERS");
+    for (var m in markers) {
+      print("${m.name} ${m.id}");
+    }
+    print("-------------");
+
+    print("CURRENT ONES");
+    for (var m in currentMarkers) {
+      print("${m.name} ${m.id}");
+    }
+    print("-------------");
+
     return SafeArea(
       child: Scaffold(
         body: Stack(
           alignment: Alignment.topCenter,
           children: <Widget>[
             GestureDetector(
-              onTapDown: (details) {
+              onTapUp: (details) {
+                FocusManager.instance.primaryFocus?.unfocus();
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                final offset = transformationController.toScene(
+                    details.globalPosition);
                 setState(() {
-                  _tapPosition = details.globalPosition;
+                  _tapPosition = Offset(offset.dx-35.0, offset.dy-65.0);
                   openMapSearch = false;
+                  nextButtonCompleter?.complete();
+                  nextButtonCompleter = null;
                 });
-                nextButtonCompleter?.complete();
-                nextButtonCompleter = null;
               },
-              child: Zoom(
-                onPositionUpdate: (Offset position) => setState(() {
-                  _globalPosition = position;
-                }),
-                onScaleUpdate: (double scale, double zoom) => setState(() {
-                  _zoomLvl = zoom;
-                }),
-
+              child: InteractiveViewer(
+                transformationController: transformationController,
+                onInteractionStart: (details) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
+                constrained: false,
+                minScale: 0.3,
                 child: Container(
                   width: 4000,
                   height: 2500,
@@ -142,47 +172,45 @@ class _HomePageState extends State<HomePage> {
                       )
                   ),
                   child: CustomMultiChildLayout(
-                    delegate: MapLayout(),
-                    children: <Widget>[
+                    delegate: MapLayout(markerList: currentMarkers),
+                    children: <Widget> [
                       for (var marker in currentMarkers)
                         LayoutId(
-                          id: markers.indexOf(marker),
-                          child: SizedBox.fromSize(
-                            size: Size(106, 106),
-                            child: ClipOval(
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  splashColor: Colors.grey[600],
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context)
-                                         => AddImageScreen(marker: marker)
-                                    ));
-                                  },
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Icon(
-                                        Icons.location_on,
-                                        size: 40.0,
-                                        color: iconColor,
-                                      ), // <-- Icon
-                                      Text(marker.name), // <-- Text
-                                    ],
-                                  ),
+                          id: marker.id,
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      AddImageScreen(marker: marker)
+                              ));
+                            },
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                const Icon(
+                                  Icons.location_on,
+                                  size: markerSize,
+                                  color: iconColor,
                                 ),
-                              ),
+                                Text(
+                                  marker.name,
+                                  style: TextStyle(
+                                    color: iconColor,
+                                    fontSize: markerSize/3
+                                  ),
+                                )
+                              ],
                             ),
                           )
                         )
-                    ],
+                    ]
                   ),
                 ),
               ),
             ),
 
-            // WIDGET A COPIAR PARA TER ACESSO AO DRAWER
+
+            // --------------------- WIDGET DE DRAWER : copiar este widget
             SlidingUpPanel(
               controller: panelController,
               borderRadius: const BorderRadius.vertical(
@@ -202,6 +230,7 @@ class _HomePageState extends State<HomePage> {
               }),
             ),
 
+            // --------------------- WIDGET DE PESQUISA
             Positioned(
               child: AnimatedOpacity(
                 opacity: openMapSearch ? 1 : 0,
@@ -209,7 +238,8 @@ class _HomePageState extends State<HomePage> {
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: TextField(
-                    controller: editingController,
+                    focusNode: focusNode,
+                    controller: searchMarkerController,
                     decoration: InputDecoration(
                       hintText: "Search marker",
                       prefixIcon: const Icon(
@@ -228,8 +258,8 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            // -----------------------------------
 
+            // --------------------- BOTAO DO MARKER
             Positioned(
               right: padding,
               bottom: buttonPosition,
@@ -239,6 +269,8 @@ class _HomePageState extends State<HomePage> {
                 child: markerButton(context),
               ),
             ),
+
+            // --------------------- BOTAO DE SETTINGS
             Positioned(
               left: padding,
               bottom: buttonPosition,
@@ -248,6 +280,8 @@ class _HomePageState extends State<HomePage> {
                   child: generalButton(context, Icons.settings)
               ),
             ),
+
+            // --------------------- BOTAO DE AJUDA
             Positioned(
               left: padding,
               bottom: buttonPosition + buttonSize + padding,
@@ -257,6 +291,8 @@ class _HomePageState extends State<HomePage> {
                   child: generalButton(context, Icons.question_mark)
               ),
             ),
+
+            // --------------------- BOTAO DE USER
             Positioned(
               left: padding,
               top: padding,
@@ -296,45 +332,69 @@ class _HomePageState extends State<HomePage> {
       elevation: elevation,
       buttonSize: const Size(buttonSize, buttonSize),
       spacing: 7,
+      onOpen: () => setState(() {
+        openMapSearch = false;
+        FocusManager.instance.primaryFocus?.unfocus();
+      }),
       children: [
         SpeedDialChild(
           child: const Icon(Icons.search),
           backgroundColor: transparencyLvl,
           foregroundColor: iconColor,
           elevation: elevation,
-          onTap: () => setState(() {
-            openMapSearch = true;
-          }),
+          onTap: () {
+            focusNode.requestFocus();
+            setState(() {
+              openMapSearch = true;
+            });
+          },
         ),
         SpeedDialChild(
           child: const Icon(Icons.add),
           backgroundColor: transparencyLvl,
           foregroundColor: iconColor,
           elevation: elevation,
-          onTap: () => showDialog(
-            context: context,
-            builder: (BuildContext context) => AlertDialog(
-              title: const Text("Add a new marker"),
-              content: const Text("Click on the map in the position where"
-                  " you would like to place a new marker."),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context, 'OK');
-                    addMarker();
-                  },
-                  style: const ButtonStyle(
-                    foregroundColor: MaterialStatePropertyAll(Color(0xFF484848))
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+            setState(() {
+              currentMarkers = markers;
+              searchMarkerController.clear();
+            });
+            showDialog(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text("Add a new marker"),
+                content: TextField(
+                  controller: newMarkerController,
+                  decoration: const InputDecoration(
+                    hintText: "Marker name",
+                    prefixIcon: Icon(Icons.location_on),
                   ),
-                  child: const Text('OK')
                 ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, 'Cancel'),
-                  child: const Text('Cancel')
-                )
-              ],
-            )
-          )
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      final name = newMarkerController.text;
+                      Navigator.pop(context, 'OK');
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      final snackBar = SnackBar(
+                        duration: Duration(seconds: 6),
+                        content: Text('Select where to place the marker.'),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      addMarker(name);
+                      newMarkerController.clear();
+                    },
+                    child: const Text('OK')
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'Cancel'),
+                    child: const Text('Cancel')
+                  )
+                ],
+              )
+            );
+          }
         ),
       ],
     );
@@ -343,22 +403,25 @@ class _HomePageState extends State<HomePage> {
 }
 
 class MapLayout extends MultiChildLayoutDelegate {
-  final constraints = const BoxConstraints(
-      maxHeight: 100.0,
-      maxWidth: 100.0
+  final List<Marker> markerList;
+  final constraints = BoxConstraints(
+      maxHeight: _HomePageState.markerSize*3,
+      maxWidth: _HomePageState.markerSize*4
   );
+
+  MapLayout({required this.markerList});
 
   @override
   void performLayout(Size size) {
-    for (final marker in currentMarkers) {
-      layoutChild(markers.indexOf(marker), constraints);
-      positionChild(markers.indexOf(marker), marker.position);
+    for (var marker in markerList) {
+      layoutChild(marker.id, constraints);
+      positionChild(marker.id, marker.position);
     }
   }
 
   @override
-  bool shouldRelayout(covariant MultiChildLayoutDelegate oldDelegate) {
-    return false;
+  bool shouldRelayout(MapLayout oldDelegate) {
+    return (markerList != oldDelegate.markerList);
   }
 
 }

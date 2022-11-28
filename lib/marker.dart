@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 class Marker {
   final Offset position;
   final String name;
+  final int id;
 
   const Marker({
     required this.position,
-    required this.name
+    required this.name,
+    required this.id
   });
 
 }
