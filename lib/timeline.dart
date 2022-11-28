@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:ipm_project/panel_widget.dart';
+import 'package:ipm_project/panel_widget_timeline.dart';
 import 'package:ipm_project/show_photo.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:timeline_tile/timeline_tile.dart';
@@ -113,7 +114,8 @@ class _TimelineState extends State<Timeline> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
             maxHeight: panelHeightOpen,
             minHeight: panelHeightClosed,
-            panelBuilder: (controller) => PanelWidget(
+            panelBuilder: (controller) => PanelWidgetTimeline(
+              marker: widget.marker,
               controller: controller,
               panelController: panelController,
             ),

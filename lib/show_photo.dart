@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
 import 'package:ipm_project/panel_widget.dart';
+import 'package:ipm_project/panel_widget_timeline.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import 'imageData.dart';
@@ -18,7 +19,8 @@ class ShowPhoto extends StatefulWidget {
   final int indexOf;
   final int currentGarden;
 
-  const ShowPhoto({super.key, required this.image, required this.marker, required this.indexOf, required this.i, required this.currentGarden});
+  const ShowPhoto({super.key, required this.image, required this.marker,
+    required this.indexOf, required this.i, required this.currentGarden});
 
   @override
   State<StatefulWidget> createState() {
@@ -31,6 +33,16 @@ class ShowPhotoState extends State<ShowPhoto> {
 
   late TextEditingController descriptionController =
       TextEditingController(text: widget.image.getDescription());
+
+
+  bool checkVisible() {
+    if (currentGarden == 1) {
+      return (widget.i < (images1[widget.indexOf].length-1));
+    }
+    else {
+      return (widget.i < (images1[widget.indexOf].length-1));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,40 +113,46 @@ class ShowPhotoState extends State<ShowPhoto> {
                     padding: const EdgeInsets.only(top: 70, right: 20),
                     child: Row(
                       children: [
-                        IconButton(
-                            onPressed: () {
-                              if(currentGarden == 1){
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        ShowPhoto(image: images1[widget.indexOf][widget.i-1], marker: markers1[widget.indexOf], indexOf: widget.indexOf, i: widget.i-1, currentGarden: currentGarden,)
-                                ));
-                              }else{
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        ShowPhoto(image: images2[widget.indexOf][widget.i-1], marker: markers1[widget.indexOf], indexOf: widget.indexOf, i: widget.i-1, currentGarden: currentGarden,)
-                                ));
-                              }
-                            },//images[widget.indexOf][widget.i-1], marker: markers1[widget.indexOf], indexOf: widget.indexOf, i: widget.i-1
-                            icon: Icon(Icons.arrow_circle_left, size: 50,)),
+                        Visibility(
+                          visible: (widget.i >= 1),
+                          child: IconButton(
+                              onPressed: () {
+                                if(currentGarden == 1){
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          ShowPhoto(image: images1[widget.indexOf][widget.i-1], marker: markers1[widget.indexOf], indexOf: widget.indexOf, i: widget.i-1, currentGarden: currentGarden,)
+                                  ));
+                                }else{
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          ShowPhoto(image: images2[widget.indexOf][widget.i-1], marker: markers1[widget.indexOf], indexOf: widget.indexOf, i: widget.i-1, currentGarden: currentGarden,)
+                                  ));
+                                }
+                              },//images[widget.indexOf][widget.i-1], marker: markers1[widget.indexOf], indexOf: widget.indexOf, i: widget.i-1
+                              icon: Icon(Icons.arrow_circle_left, size: 50,)),
+                        ),
                         Spacer(),
                         Padding(
                           padding: const EdgeInsets.only(top:20, left: 20),
                           child: Text(widget.image.date, style: TextStyle(fontSize: 20),),
                         ),
                         Spacer(),
-                        IconButton( onPressed: () {
-                          if(currentGarden == 1){
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    ShowPhoto(image: images1[widget.indexOf][widget.i+1], marker: markers1[widget.indexOf], indexOf: widget.indexOf, i: widget.i+1, currentGarden: currentGarden,)
-                            ));
-                          }else{
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    ShowPhoto(image: images2[widget.indexOf][widget.i+1], marker: markers1[widget.indexOf], indexOf: widget.indexOf, i: widget.i+1, currentGarden: currentGarden,)
-                            ));
-                          }
-                        }, icon: Icon(Icons.arrow_circle_right, size: 50,)),
+                        Visibility(
+                          visible: checkVisible(),
+                          child: IconButton( onPressed: () {
+                            if(currentGarden == 1){
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      ShowPhoto(image: images1[widget.indexOf][widget.i+1], marker: markers1[widget.indexOf], indexOf: widget.indexOf, i: widget.i+1, currentGarden: currentGarden,)
+                              ));
+                            }else{
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      ShowPhoto(image: images2[widget.indexOf][widget.i+1], marker: markers1[widget.indexOf], indexOf: widget.indexOf, i: widget.i+1, currentGarden: currentGarden,)
+                              ));
+                            }
+                          }, icon: Icon(Icons.arrow_circle_right, size: 50,)),
+                        ),
                       ],
                     ),
                   ),
@@ -143,11 +161,11 @@ class ShowPhotoState extends State<ShowPhoto> {
 
               SlidingUpPanel(
                 controller: panelController,
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(15)),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                 maxHeight: panelHeightOpen,
                 minHeight: panelHeightClosed,
-                panelBuilder: (controller) => PanelWidget(
+                panelBuilder: (controller) => PanelWidgetTimeline(
+                  marker: widget.marker,
                   controller: controller,
                   panelController: panelController,
                 ),
@@ -170,7 +188,8 @@ class ShowPhotoState extends State<ShowPhoto> {
 
 moveToTimeline(context, Marker marker) {
   Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => Timeline(indexOf: markers1.indexOf(marker), currentGarden: currentGarden, marker: marker,)));
+      builder: (context) => Timeline(indexOf: markers1.indexOf(marker),
+        currentGarden: currentGarden, marker: marker,)));
 }
 
 moveBack(context) {

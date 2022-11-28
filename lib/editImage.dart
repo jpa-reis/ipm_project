@@ -115,10 +115,14 @@ class EditImageState extends State<EditImageScreen> {
 
 moveToTimeline(context,Marker marker){
   if(currentGarden == 1){
+    Navigator.pop(context);
+    Navigator.pop(context);
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => Timeline(indexOf: markers1.indexOf(marker), currentGarden: currentGarden, marker: marker,)));
   }
   else{
+    Navigator.pop(context);
+    Navigator.pop(context);
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => Timeline(indexOf: markers2.indexOf(marker), currentGarden: currentGarden, marker: marker,)));
   }

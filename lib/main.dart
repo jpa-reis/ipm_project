@@ -87,7 +87,8 @@ class _HomePageState extends State<HomePage> {
     var newMarker = Marker(
         position: mPosition,
         name: markerName,
-        id: (currentGarden == 1) ? markers1.length : markers2.length
+        id: (currentGarden == 1) ? markers1.length : markers2.length,
+        description: ""
     );
 
     if (currentGarden == 1) {
