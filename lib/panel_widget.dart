@@ -63,10 +63,10 @@ class _PanelWidgetState extends State<PanelWidget> {
       children: <Widget>[
         const SizedBox(height: 10),
         buildHandle(),
-        const ListTile(
+        ListTile(
           title: Center(
             child: Text(
-              "Jardim Botânico de Lisboa",
+              (currentGarden == 1) ? "Jardim Botânico de Lisboa" : "Estufa Fria",
               style: TextStyle(fontSize: 18),
             ),
           ),
@@ -89,11 +89,10 @@ class _PanelWidgetState extends State<PanelWidget> {
             final garden = gardenOptions[index];
             return ListTile(
               title: Text(garden.name),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => garden.page
-                ));
-              }
+              onTap: () => setState(() {
+                currentGarden = garden.id;
+                widget.panelController.close();
+              })
             );
           },
         ),

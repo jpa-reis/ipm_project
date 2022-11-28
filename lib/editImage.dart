@@ -85,7 +85,7 @@ class EditImageState extends State<EditImageScreen> {
 
 moveToTimeline(context,Marker marker){
   Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => Timeline(indexOf: markers.indexOf(marker))));
+      builder: (context) => Timeline(indexOf: markers1.indexOf(marker))));
 }
 moveBack(context){
   Navigator.pop(context);

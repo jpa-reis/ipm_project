@@ -85,16 +85,22 @@ class _HomePageState extends State<HomePage> {
     var newMarker = Marker(
         position: mPosition,
         name: markerName,
-        id: markers.length
+        id: (currentGarden == 1) ? markers1.length : markers2.length
     );
-    print("IM HERE");
-    markers.add(newMarker);
+
+    if (currentGarden == 1) {
+      markers1.add(newMarker);
+    }
+    else {
+      markers2.add(newMarker);
+    }
     images.add(<ImageData>[]);
   }
 
   late List<Marker> currentMarkers;
   void searchMarker(String query) {
-    final suggestions = markers.where((marker) {
+    final markerList = (currentGarden == 1) ? markers1 : markers2;
+    final suggestions = markerList.where((marker) {
       final markerName = marker.name.toLowerCase();
       final searchQuery = query.toLowerCase();
 
@@ -107,9 +113,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     transformationController.value = Matrix4.identity();
-    transformationController.value.translate(-200.0, 0.0);
+    transformationController.value.translate(-800.0, -600.0);
 
-    currentMarkers = markers;
+    currentMarkers = markers1;
     _tapPosition = const Offset(0.0, 0.0);
     buttonPosition = initButtonPosition;
     panelClosed = true;
@@ -125,17 +131,7 @@ class _HomePageState extends State<HomePage> {
     padding = MediaQuery.of(context).size.height * 0.02;
     buttonPosition = panelHeightClosed + padding;
 
-    print("MARKERS");
-    for (var m in markers) {
-      print("${m.name} ${m.id}");
-    }
-    print("-------------");
-
-    print("CURRENT ONES");
-    for (var m in currentMarkers) {
-      print("${m.name} ${m.id}");
-    }
-    print("-------------");
+    currentMarkers = (currentGarden == 1) ? markers1 : markers2;
 
     return SafeArea(
       child: Scaffold(
@@ -150,6 +146,7 @@ class _HomePageState extends State<HomePage> {
                     details.globalPosition);
                 setState(() {
                   _tapPosition = Offset(offset.dx-35.0, offset.dy-65.0);
+                  print("AAAAA $_tapPosition");
                   openMapSearch = false;
                   nextButtonCompleter?.complete();
                   nextButtonCompleter = null;
@@ -161,15 +158,18 @@ class _HomePageState extends State<HomePage> {
                   FocusManager.instance.primaryFocus?.unfocus();
                 },
                 constrained: false,
-                minScale: 0.3,
+                minScale: 0.5,
+                maxScale: 1.1,
                 child: Container(
-                  width: 4000,
-                  height: 2500,
-                  decoration: const BoxDecoration(
-                      image: DecorationImage(
-                          fit: BoxFit.fill,
-                          image: AssetImage('lib/jardim.png')
-                      )
+                  width: (currentGarden == 1) ? 4000 : 5200,
+                  height: (currentGarden == 1) ? 2500 : 4300,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      fit: BoxFit.fill,
+                      image: (currentGarden == 1)
+                          ? AssetImage('lib/jardim.png')
+                          : AssetImage('lib/estufa.png')
+                    )
                   ),
                   child: CustomMultiChildLayout(
                     delegate: MapLayout(markerList: currentMarkers),
@@ -196,7 +196,7 @@ class _HomePageState extends State<HomePage> {
                                   marker.name,
                                   style: TextStyle(
                                     color: iconColor,
-                                    fontSize: markerSize/3
+                                    fontSize: markerSize/2.3
                                   ),
                                 )
                               ],
@@ -357,7 +357,7 @@ class _HomePageState extends State<HomePage> {
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
             setState(() {
-              currentMarkers = markers;
+              currentMarkers = (currentGarden == 1) ? markers1 : markers2;
               searchMarkerController.clear();
             });
             showDialog(
