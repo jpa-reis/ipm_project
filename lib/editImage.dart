@@ -1,5 +1,8 @@
 import 'dart:developer';
 import 'dart:io';
+import 'dart:ui';
+import 'package:ipm_project/main.dart';
+
 import 'imageData.dart';
 import 'marker.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +11,11 @@ import 'globals.dart';
 // A widget that edits a given image.
 class EditImageScreen extends StatefulWidget {
 
-  const EditImageScreen({super.key, required this.image, required this.marker});
   final ImageData image;
   final Marker marker;
+  final int currentGarden;
+
+  const EditImageScreen({super.key, required this.image, required this.marker, required this.currentGarden});
 
   @override
   State<StatefulWidget> createState() {
@@ -27,12 +32,40 @@ class EditImageState extends State<EditImageScreen> {
   Widget build(BuildContext context) {
     final bottomBarHeight = MediaQuery.of(context).size.height * 0.1;
     return Scaffold(
+      backgroundColor: Colors.grey,
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
             children: <Widget>[
-              const SizedBox(height: 50),
+              Container(
+                height: MediaQuery. of(context). size. height*0.5,
+                width:  MediaQuery. of(context). size. width,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: Image.file(File(widget.image.getImagePath())).image,
+                    fit: BoxFit.cover,
+                  ),
+
+                ),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 20.0),
+                  child: Container(
+                    decoration: BoxDecoration(color: Colors.black.withOpacity(0.3)),
+                    child: Image.file(File(widget.image.getImagePath())) /* add child content here */,
+                  ),),),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  maxLines: 5,
+                  controller: descriptionController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Description',
+                  ),
+                ),
+              ),
               Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -49,17 +82,6 @@ class EditImageState extends State<EditImageScreen> {
                     ),
                   ]
               ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: descriptionController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Description',
-                ),
-              ),
-              const SizedBox(height: 20),
-              Flexible(child: Card(child: Image.file(File(widget.image.getImagePath())))),
-              const SizedBox(height: 20),
             ]
         ),
       ),
@@ -92,8 +114,15 @@ class EditImageState extends State<EditImageScreen> {
 
 
 moveToTimeline(context,Marker marker){
-  Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => Timeline(indexOf: markers1.indexOf(marker))));
+  if(currentGarden == 1){
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => Timeline(indexOf: markers1.indexOf(marker), currentGarden: currentGarden, marker: marker,)));
+  }
+  else{
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => Timeline(indexOf: markers2.indexOf(marker), currentGarden: currentGarden, marker: marker,)));
+  }
+
 }
 moveBack(context){
   Navigator.pop(context);

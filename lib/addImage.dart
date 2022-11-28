@@ -10,9 +10,10 @@ import 'timeline.dart';
 
 // a widget that allows users to choose how to add an image
 class AddImageScreen extends StatelessWidget {
-  const AddImageScreen({super.key, required this.marker});
+  const AddImageScreen({super.key, required this.marker, required this.currentGarden});
 
   final Marker marker;
+  final int currentGarden;
 
   @override
   Widget build(BuildContext context){
@@ -87,7 +88,12 @@ addImage(bool useCamera, Marker marker,BuildContext context) async{
   String date = ("${now.day}/${now.month}");
   int markerIndex = markers1.indexOf(marker);
   ImageData i = ImageData(imagePath: image.path,date: date,markerIndex: markerIndex);
-  images[markers1.indexOf(marker)].add(i);
+  if(currentGarden == 1){
+    images1[markers1.indexOf(marker)].add(i);
+  }
+  else{
+    images2[markers2.indexOf(marker)].add(i);
+  }
   navigator.push(MaterialPageRoute(
-      builder: (context) => EditImageScreen(image: i, marker: marker,)));
+      builder: (context) => EditImageScreen(image: i, marker: marker, currentGarden: currentGarden,)));
 }

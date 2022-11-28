@@ -33,4 +33,8 @@ List<Marker> markers2 = [
 int currentGarden = 1;
 
 
-final images = <List<ImageData>>[<ImageData>[], <ImageData>[], <ImageData>[]];
+final images1 = <List<ImageData>>[<ImageData>[], <ImageData>[], <ImageData>[]];
+final images2 = <List<ImageData>>[<ImageData>[], <ImageData>[], <ImageData>[]];
+
+final community1 = <List<ImageData>>[<ImageData>[], <ImageData>[], <ImageData>[]];
+final community2 = <List<ImageData>>[<ImageData>[], <ImageData>[], <ImageData>[]];

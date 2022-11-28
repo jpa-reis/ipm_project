@@ -1,103 +1,131 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:ipm_project/panel_widget.dart';
+import 'package:ipm_project/show_photo.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:timeline_tile/timeline_tile.dart';
+import 'dart:developer';
+
+import 'package:ipm_project/panel_widget.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import 'globals.dart';
 import 'imageData.dart';
+import 'marker.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'editImage.dart';
+import 'timeline.dart';
+import 'globals.dart';
+import 'imageData.dart';
+
 class Timeline extends StatefulWidget {
+  const Timeline(
+      {super.key, required this.indexOf, required this.currentGarden, required this.marker});
 
-  const Timeline({super.key, required this.indexOf});
   final int indexOf;
-
+  final int currentGarden;
+  final Marker marker;
   @override
   State<Timeline> createState() => _TimelineState(indexOf);
 }
 
 class _TimelineState extends State<Timeline> {
   _TimelineState(this.indexOf);
+
   final int indexOf;
-
-  static const double buttonSize = 50.0;
-  final panelController = PanelController();
-  static const double initButtonPosition = buttonSize + 30.0;
-  Color transparencyLvl = Colors.white.withOpacity(0.7);
-  double buttonPosition = initButtonPosition;
-  double padding = 15.0;
-  bool panelClosed = true;
-  bool openMapSearch = false;
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
-    final panelHeightClosed = MediaQuery.of(context).size.height * 0.08;
+    final panelHeightClosed = MediaQuery.of(context).size.height * 0.1;
     final panelHeightOpen = MediaQuery.of(context).size.height * 0.9;
+    final panelController = PanelController();
+    const double buttonSize = 50.0;
+    const double initButtonPosition = buttonSize + 30.0;
+    late double buttonPosition;
+    buttonPosition = initButtonPosition;
+    double padding = 15.0;
+    buttonPosition = panelHeightClosed + padding;
+    late bool panelClosed = true;
+    late bool openMapSearch = false;
 
     return Scaffold(
         backgroundColor: Colors.transparent,
-        body: DefaultTabController(
-          animationDuration: Duration.zero,
-          length: 2,
-          child: Scaffold(
-            appBar: PreferredSize(
-              preferredSize: const Size.fromHeight(70),
-              child: Theme(
-                data: ThemeData(
-                  highlightColor: Colors.transparent,
-                  splashColor: Colors.transparent,
+        body: Stack(children: [
+          Container(
+            height: MediaQuery.of(context).size.height*0.95,
+            child: DefaultTabController(
+              animationDuration: Duration.zero,
+              length: 2,
+              child: Scaffold(
+                appBar: PreferredSize(
+                  preferredSize: const Size.fromHeight(70),
+                  child: Theme(
+                    data: ThemeData(
+                      highlightColor: Colors.transparent,
+                      splashColor: Colors.transparent,
+                    ),
+                    child: AppBar(
+                      backgroundColor: Color(0xff054f20),
+                      elevation: 0,
+                      bottom: TabBar(
+                          padding: EdgeInsets.all(8.0),
+                          labelColor: Colors.white,
+                          unselectedLabelColor: Colors.white,
+                          indicatorSize: TabBarIndicatorSize.label,
+                          indicator: BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(30)),
+                              color: Color(0xff076e2c)),
+                          tabs: const [
+                            Tab(
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text("My timeline"),
+                              ),
+                            ),
+                            Tab(
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text("Community"),
+                              ),
+                            ),
+                          ]),
+                    ),
+                  ),
                 ),
-                child: AppBar(
-                  backgroundColor: Color(0xff054f20),
-                  elevation: 0,
-                  bottom: TabBar(
-                      padding: EdgeInsets.all(8.0),
-                      labelColor: Colors.white,
-                      unselectedLabelColor: Colors.white,
-                      indicatorSize: TabBarIndicatorSize.label,
-                      indicator: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
-
-                          color: Color(0xff076e2c)),
-                      tabs: const [
-                        Tab(
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Text("My timeline"),
-                          ),
-                        ),
-                        Tab(
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Text("Community"),
-                          ),
-                        ),
-                      ]),
-                ),
+                body: TabBarView(children: [
+                  Container(
+                    color: Colors.white,
+                    child: ListView(physics: const AlwaysScrollableScrollPhysics(),children: createTimeline()),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    child: ListView(children: createTimeline()),
+                  ),
+                ]),
               ),
             ),
-            body: TabBarView(children: [
-              Container(
-                color:  Colors.white,
-
-                child: ListView(
-                  children: createTimeline()
-                ),
-              ),
-              Container(
-                color:  Colors.white,
-
-                child: ListView(
-                    children: createTimeline()
-                ),
-              ),
-            ]),
           ),
-        ));
+          SlidingUpPanel(
+            controller: panelController,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+            maxHeight: panelHeightOpen,
+            minHeight: panelHeightClosed,
+            panelBuilder: (controller) => PanelWidget(
+              controller: controller,
+              panelController: panelController,
+            ),
+            onPanelSlide: (position) => setState(() {
+              buttonPosition =
+                  position * (panelHeightOpen - panelHeightClosed) +
+                      initButtonPosition;
+              panelClosed = ((buttonPosition - initButtonPosition) == 0);
+              openMapSearch = false;
+            }),
+          ),
+        ]));
   }
 
   createTimeline() {
@@ -105,33 +133,82 @@ class _TimelineState extends State<Timeline> {
     int i = 0;
     list.add(startingTimeline());
 
-    while(i < images[indexOf].length){
-      if(i % 2 == 0 && i == 0){
-        list.add(evenTimeline(i));
+    if (currentGarden == 1) {
+      while (i < images1[indexOf].length) {
+        if (i % 2 == 0 && i == 0) {
+          list.add(evenTimeline(i));
+        } else if (i % 2 == 0) {
+          list.add(addDivider());
+          list.add(evenTimeline(i));
+        } else {
+          list.add(addDivider());
+          list.add(oddTimeline(i));
+        }
+        i++;
       }
-      else if(i % 2 == 0){
-        list.add(addDivider());
-        list.add(evenTimeline(i));
+    } else {
+      while (i < images2[indexOf].length) {
+        if (i % 2 == 0 && i == 0) {
+          list.add(evenTimeline(i));
+        } else if (i % 2 == 0) {
+          list.add(addDivider());
+          list.add(evenTimeline(i));
+        } else {
+          list.add(addDivider());
+          list.add(oddTimeline(i));
+        }
+        i++;
       }
-      else{
-        list.add(addDivider());
-        list.add(oddTimeline(i));
-      }
-      i++;
     }
 
-    if(i % 2 == 0){
+    if (i % 2 == 0) {
       list.add(lastTimelineEven());
-    }
-    else{
+    } else {
       list.add(lastTimelineOdd());
     }
 
-
+    list.add(addLastIcons());
+    list.add(SizedBox(width: 300,));
     return list;
   }
 
-  Widget startingTimeline(){
+  Widget addLastIcons(){
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 60),
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton(
+                onPressed: () async {
+                  ImageData image =
+                  await addImage(true, widget.marker, context);
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(20),
+                ),
+                child: const Icon(Icons.camera_alt, size: 30),
+              ),
+              const SizedBox(width: 200),
+              ElevatedButton(
+                onPressed: () async {
+                  ImageData image =
+                  await addImage(false, widget.marker, context);
+
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(20),
+                ),
+                child: const Icon(Icons.add_photo_alternate,
+                    size: 30),
+              ),
+            ]),
+      );
+
+  }
+
+  Widget startingTimeline() {
     return TimelineTile(
       afterLineStyle: LineStyle(
         color: Color(0xFF618A3D),
@@ -141,8 +218,7 @@ class _TimelineState extends State<Timeline> {
         drawGap: true,
         width: 30,
         height: 30,
-        color:  Color(0xFF618A3D),
-
+        color: Color(0xFF618A3D),
       ),
       alignment: TimelineAlign.manual,
       lineXY: 0.15,
@@ -150,14 +226,13 @@ class _TimelineState extends State<Timeline> {
       endChild: Center(
         child: Text(
           "Timeline starts here...",
-          style: TextStyle(
-              fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
     );
   }
 
-  Widget evenTimeline(int i){
+  Widget evenTimeline(int i) {
     return TimelineTile(
       beforeLineStyle: LineStyle(
         color: Color(0xFF618A3D),
@@ -179,10 +254,11 @@ class _TimelineState extends State<Timeline> {
           ),
           child: Center(
             child: Text(
-              images[indexOf][i].date,
+              (currentGarden == 1)
+                  ? images1[indexOf][i].date
+                  : images2[indexOf][i].date,
               style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF618A3D)),
+                  fontWeight: FontWeight.bold, color: Color(0xFF618A3D)),
             ),
           ),
         ),
@@ -196,29 +272,49 @@ class _TimelineState extends State<Timeline> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.file(File(images[indexOf][i].imagePath),
-                  width: 300, height: 200, fit: BoxFit.cover),
+              child: GestureDetector(
+                onTap: () {
+                  if (currentGarden == 1) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ShowPhoto(
+                            image: images1[indexOf][i],
+                            marker: markers1[indexOf],
+                            indexOf: indexOf,
+                            i: i,
+                            currentGarden: currentGarden)));
+                  } else {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ShowPhoto(
+                            image: images2[indexOf][i],
+                            marker: markers2[indexOf],
+                            indexOf: indexOf,
+                            i: i,
+                            currentGarden: currentGarden)));
+                  }
+                },
+                child: (currentGarden == 1)
+                    ? Image.file(File(images1[indexOf][i].imagePath))
+                    : Image.file(File(images2[indexOf][i].imagePath),
+                        width: 300, height: 200, fit: BoxFit.cover),
+              ),
             ),
             Row(
               children: [
                 Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.search),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(images[indexOf][i].description),
+                  child: (currentGarden == 1)
+                      ? Text(images1[indexOf][i].description)
+                      : Text(images2[indexOf][i].description),
                 )
               ],
             ),
-
           ],
         ),
       ),
     );
   }
 
-  Widget oddTimeline(int i){
+  Widget oddTimeline(int i) {
     return TimelineTile(
       beforeLineStyle: LineStyle(
         color: Color(0xFF618A3D),
@@ -240,10 +336,11 @@ class _TimelineState extends State<Timeline> {
           ),
           child: Center(
             child: Text(
-              images[indexOf][i].date,
+              (currentGarden == 1)
+                  ? images1[indexOf][i].date
+                  : images2[indexOf][i].date,
               style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF618A3D)),
+                  fontWeight: FontWeight.bold, color: Color(0xFF618A3D)),
             ),
           ),
         ),
@@ -257,30 +354,54 @@ class _TimelineState extends State<Timeline> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child:  Image.file(File(images[indexOf][i].imagePath),
-                  width: 300, height: 200, fit: BoxFit.cover),
+              child: GestureDetector(
+                onTap: () {
+                  if (currentGarden == 1) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ShowPhoto(
+                            image: images1[indexOf][i],
+                            marker: markers1[indexOf],
+                            indexOf: indexOf,
+                            i: i,
+                            currentGarden: currentGarden)));
+                  } else {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ShowPhoto(
+                            image: images2[indexOf][i],
+                            marker: markers2[indexOf],
+                            indexOf: indexOf,
+                            i: i,
+                            currentGarden: currentGarden)));
+                  }
+                },
+                child: (currentGarden == 1)
+                    ? Image.file(File(images1[indexOf][i].imagePath))
+                    : Image.file(File(images2[indexOf][i].imagePath),
+                        width: 300, height: 200, fit: BoxFit.cover),
+              ),
             ),
             Row(
-              children:[
+              children: [
                 Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.search),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(images[indexOf][i].description),
+                  child: (currentGarden == 1)
+                      ? Text(images1[indexOf][i].description)
+                      : Text(images2[indexOf][i].description),
                 )
               ],
             ),
-
           ],
         ),
       ),
     );
   }
 
-  Widget lastTimelineOdd(){
+  Widget lastTimelineOdd() {
     return TimelineTile(
+      beforeLineStyle: LineStyle(
+        color: Color(0xFF618A3D),
+        thickness: 3,
+      ),
       afterLineStyle: LineStyle(
         color: Color(0xFF618A3D),
         thickness: 3,
@@ -289,8 +410,7 @@ class _TimelineState extends State<Timeline> {
         drawGap: true,
         width: 30,
         height: 30,
-        color:  Color(0xFF618A3D),
-
+        color: Color(0xFF618A3D),
       ),
       alignment: TimelineAlign.manual,
       lineXY: 0.15,
@@ -298,14 +418,13 @@ class _TimelineState extends State<Timeline> {
       endChild: Center(
         child: Text(
           "Timeline ends here...",
-          style: TextStyle(
-              fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
     );
   }
 
-  Widget lastTimelineEven(){
+  Widget lastTimelineEven() {
     return TimelineTile(
       afterLineStyle: LineStyle(
         color: Color(0xFF618A3D),
@@ -315,8 +434,7 @@ class _TimelineState extends State<Timeline> {
         drawGap: true,
         width: 30,
         height: 30,
-        color:  Color(0xFF618A3D),
-
+        color: Color(0xFF618A3D),
       ),
       alignment: TimelineAlign.manual,
       lineXY: 0.85,
@@ -324,14 +442,13 @@ class _TimelineState extends State<Timeline> {
       endChild: Center(
         child: Text(
           "Timeline ends here...",
-          style: TextStyle(
-              fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
     );
   }
 
-  Widget addDivider(){
+  Widget addDivider() {
     return const TimelineDivider(
       begin: 0.15,
       end: 0.85,
@@ -339,5 +456,33 @@ class _TimelineState extends State<Timeline> {
       color: Color(0xFF618A3D),
     );
   }
-
 }
+
+//adds image to images list and moves to edit screen of that image
+addImage(bool useCamera, Marker marker, BuildContext context) async {
+  final navigator = Navigator.of(context);
+  XFile? image;
+  if (useCamera) {
+    image = await ImagePicker().pickImage(source: ImageSource.camera);
+  } else {
+    image = await ImagePicker().pickImage(source: ImageSource.gallery);
+  }
+  if (image == null) return;
+  final now = DateTime.now();
+  String date = ("${now.day}/${now.month}");
+  int markerIndex = markers1.indexOf(marker);
+  ImageData i =
+  ImageData(imagePath: image.path, date: date, markerIndex: markerIndex);
+  if (currentGarden == 1) {
+    images1[markers1.indexOf(marker)].add(i);
+  } else {
+    images2[markers2.indexOf(marker)].add(i);
+  }
+  navigator.push(MaterialPageRoute(
+      builder: (context) => EditImageScreen(
+        image: i,
+        marker: marker,
+        currentGarden: currentGarden,
+      )));
+}
+

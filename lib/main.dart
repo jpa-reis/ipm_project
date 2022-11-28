@@ -7,6 +7,7 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'marker.dart';
 import 'imageData.dart';
+import 'timeline.dart';
 
 void main() {
   runApp(const App());
@@ -22,6 +23,7 @@ class App extends StatelessWidget {
     return MaterialApp(
         title: 'Time Garden',
         theme: ThemeData(
+          fontFamily: 'SanFrancisco',
           colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.white
           ),
@@ -53,11 +55,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   // -------------------------------------------------------- BUTTONS
-  static const Color iconColor = Color(0xFF383838);
+  static const Color iconColor = Color(0xFF006525);
   static const double elevation = 0;
   static const double buttonSize = 50.0;
   static const double markerSize = 50.0;
-  Color transparencyLvl = Colors.white.withOpacity(0.8);
+  Color transparencyLvl = Color(0xff51983c).withOpacity(0.7);
   // -------------------------------------------------------
 
   static const double initButtonPosition = buttonSize + 30.0;
@@ -94,7 +96,7 @@ class _HomePageState extends State<HomePage> {
     else {
       markers2.add(newMarker);
     }
-    images.add(<ImageData>[]);
+    (currentGarden == 1) ? images1.add(<ImageData>[]) : images2.add(<ImageData>[]);
   }
 
   late List<Marker> currentMarkers;
@@ -179,10 +181,37 @@ class _HomePageState extends State<HomePage> {
                           id: marker.id,
                           child: TextButton(
                             onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      AddImageScreen(marker: marker)
-                              ));
+                              if(currentGarden == 1){
+                                if(images1[markers1.indexOf(marker)].isEmpty){
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          AddImageScreen(marker: marker, currentGarden: currentGarden,)
+                                  ));
+                                }
+                                else{
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          Timeline(indexOf: markers1.indexOf(marker), currentGarden: currentGarden, marker: marker,)
+                                  ));
+                                }
+                              }
+                              else{
+                                if(images2[markers2.indexOf(marker)].isEmpty){
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          AddImageScreen(marker: marker, currentGarden: currentGarden,)
+                                  ));
+                                }
+                                else{
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          Timeline(indexOf: markers2.indexOf(marker), currentGarden: currentGarden, marker: marker,)
+                                  ));
+                                }
+                              }
+
+
+
                             },
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.end,
@@ -190,12 +219,12 @@ class _HomePageState extends State<HomePage> {
                                 const Icon(
                                   Icons.location_on,
                                   size: markerSize,
-                                  color: iconColor,
+                                  color: Color(0xFF8D021F),
                                 ),
                                 Text(
                                   marker.name,
                                   style: TextStyle(
-                                    color: iconColor,
+                                    color: Colors.black54,
                                     fontSize: markerSize/2.3
                                   ),
                                 )
@@ -212,6 +241,8 @@ class _HomePageState extends State<HomePage> {
 
             // --------------------- WIDGET DE DRAWER : copiar este widget
             SlidingUpPanel(
+              color: Color(0xFF75A889),
+              boxShadow: [],
               controller: panelController,
               borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(15)),
@@ -328,7 +359,7 @@ class _HomePageState extends State<HomePage> {
       overlayOpacity: 0,
       icon: Icons.location_on,
       backgroundColor: transparencyLvl,
-      foregroundColor: iconColor,
+      foregroundColor: Color(0xFF8D021F),
       elevation: elevation,
       buttonSize: const Size(buttonSize, buttonSize),
       spacing: 7,
