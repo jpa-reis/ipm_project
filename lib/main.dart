@@ -13,7 +13,6 @@ void main() {
   runApp(const App());
 }
 
-
 class App extends StatelessWidget {
   const App({super.key});
 
@@ -23,19 +22,13 @@ class App extends StatelessWidget {
     return MaterialApp(
         title: 'Time Garden',
         theme: ThemeData(
-          fontFamily: 'SanFrancisco',
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.white
-          ),
-          snackBarTheme: SnackBarThemeData(
-            actionTextColor: Colors.white
-          ),
-          textButtonTheme: TextButtonThemeData(
-            style: ButtonStyle(
-              foregroundColor: MaterialStatePropertyAll(Colors.grey[800])
-            )
-          )
-        ),
+            fontFamily: 'SanFrancisco',
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+            snackBarTheme: SnackBarThemeData(actionTextColor: Colors.white),
+            textButtonTheme: TextButtonThemeData(
+                style: ButtonStyle(
+                    foregroundColor:
+                        MaterialStatePropertyAll(Colors.grey[800])))),
         home: const HomePage(title: 'Time Garden'));
   }
 }
@@ -49,17 +42,13 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-
-
-
 class _HomePageState extends State<HomePage> {
-
   // -------------------------------------------------------- BUTTONS
   static const Color iconColor = Color(0xFF006525);
   static const double elevation = 0;
   static const double buttonSize = 50.0;
   static const double markerSize = 50.0;
-  Color transparencyLvl =Color(0xFF75A889).withOpacity(0.7);
+  Color transparencyLvl = Color(0xFF75A889).withOpacity(0.7);
   // -------------------------------------------------------
 
   static const double initButtonPosition = buttonSize + 30.0;
@@ -89,19 +78,18 @@ class _HomePageState extends State<HomePage> {
         position: mPosition,
         name: markerName,
         id: (currentGarden == 1) ? markers1.length : markers2.length,
-        description: ""
-    );
+        description: "");
 
     if (currentGarden == 1) {
       markers1.add(newMarker);
       community1.add(<ImageData>[]);
-    }
-    else {
+    } else {
       markers2.add(newMarker);
       community2.add(<ImageData>[]);
     }
-    (currentGarden == 1) ? images1.add(<ImageData>[]) :
-        images2.add(<ImageData>[]);
+    (currentGarden == 1)
+        ? images1.add(<ImageData>[])
+        : images2.add(<ImageData>[]);
   }
 
   late List<Marker> currentMarkers;
@@ -122,8 +110,7 @@ class _HomePageState extends State<HomePage> {
       if (currentGarden == 1) {
         markers1.remove(marker);
         currentMarkers = markers1;
-      }
-      else {
+      } else {
         markers2.remove(marker);
         currentMarkers = markers2;
       }
@@ -145,217 +132,227 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     final panelHeightClosed = MediaQuery.of(context).size.height * 0.1;
     final panelHeightOpen = MediaQuery.of(context).size.height * 0.9;
     padding = MediaQuery.of(context).size.height * 0.02;
-    buttonPosition = panelHeightClosed + padding;
+    buttonPosition = panelHeightClosed * 1.8;
 
     return SafeArea(
       child: Scaffold(
-        body: Stack(
-          alignment: Alignment.topCenter,
-          children: <Widget>[
-            GestureDetector(
-              onTapUp: (details) {
-                FocusManager.instance.primaryFocus?.unfocus();
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                final offset = transformationController.toScene(
-                    details.globalPosition);
-                setState(() {
-                  _tapPosition = Offset(offset.dx-35.0, offset.dy-95.0);
-                  openMapSearch = false;
-                  deleteMarker = false;
-                  nextButtonCompleter?.complete();
-                  nextButtonCompleter = null;
-                });
-              },
-              child: InteractiveViewer(
-                transformationController: transformationController,
-                onInteractionStart: (details) {
+        body: SlidingUpPanel(
+          backdropTapClosesPanel: true,
+          color: Color(0xff054f20),
+          controller: panelController,
+          maxHeight: panelHeightOpen,
+          minHeight: panelHeightClosed,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+          boxShadow: [ BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: Offset(0, 3),
+          )],
+          panelBuilder: (controller) => PanelWidget(
+            controller: controller,
+            panelController: panelController,
+          ),
+          onPanelSlide: (position) => setState(() {
+            buttonPosition =
+                position * (panelHeightOpen - panelHeightClosed) +
+                    initButtonPosition;
+            panelClosed = buttonPosition == initButtonPosition;
+            openMapSearch = false;
+          }),
+          body: Stack(
+            alignment: Alignment.topCenter,
+            children: <Widget>[
+              GestureDetector(
+                onTapUp: (details) {
                   FocusManager.instance.primaryFocus?.unfocus();
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  final offset =
+                      transformationController.toScene(details.globalPosition);
+                  setState(() {
+                    _tapPosition = Offset(offset.dx - 35.0, offset.dy - 95.0);
+                    openMapSearch = false;
+                    deleteMarker = false;
+                    nextButtonCompleter?.complete();
+                    nextButtonCompleter = null;
+                  });
                 },
-                constrained: false,
-                minScale: 0.2,
-                maxScale: 1.1,
-                child: Container(
-                  width: (currentGarden == 1) ? 4000 : 5200,
-                  height: (currentGarden == 1) ? 2500 : 4300,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      fit: BoxFit.fill,
-                      image: (currentGarden == 1)
-                          ? AssetImage('lib/jardim.png')
-                          : AssetImage('lib/estufa.png')
-                    )
-                  ),
-                  child: CustomMultiChildLayout(
-                    delegate: MapLayout(markerList: currentMarkers),
-                    children: <Widget> [
-                      for (var marker in currentMarkers)
-                        LayoutId(
-                          id: marker.id,
-                          child: TextButton(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                              if (deleteMarker) {
-                                removeMarker(marker);
-                              }
-                              else {
-                                if(currentGarden == 1){
-                                  if(images1[markers1.indexOf(marker)].isEmpty){
-                                    Navigator.of(context).push(MaterialPageRoute(
-                                        builder: (context) =>
-                                            AddImageScreen(marker: marker, currentGarden: currentGarden,)
-                                    ));
-                                  }
-                                  else{
-                                    Navigator.of(context).push(MaterialPageRoute(
-                                        builder: (context) =>
-                                            Timeline(indexOf: markers1.indexOf(marker), currentGarden: currentGarden, marker: marker,)
-                                    ));
-                                  }
-                                }
-                                else{
-                                  if(images2[markers2.indexOf(marker)].isEmpty){
-                                    Navigator.of(context).push(MaterialPageRoute(
-                                        builder: (context) =>
-                                            AddImageScreen(marker: marker, currentGarden: currentGarden,)
-                                    ));
-                                  }
-                                  else{
-                                    Navigator.of(context).push(MaterialPageRoute(
-                                        builder: (context) =>
-                                            Timeline(indexOf: markers2.indexOf(marker), currentGarden: currentGarden, marker: marker,)
-                                    ));
-                                  }
-                                }
-                              }
-                            },
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                const Icon(
-                                  Icons.location_on,
-                                  size: markerSize,
-                                  color: Color(0xFF8D021F),
-                                ),
-                                Text(
-                                  marker.name,
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: markerSize/2.3
+                child: InteractiveViewer(
+                  transformationController: transformationController,
+                  onInteractionStart: (details) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
+                  constrained: false,
+                  minScale: 0.2,
+                  maxScale: 1.1,
+                  child: Container(
+                    width: (currentGarden == 1) ? 4000 : 5200,
+                    height: (currentGarden == 1) ? 2500 : 4300,
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            fit: BoxFit.fill,
+                            image: (currentGarden == 1)
+                                ? AssetImage('lib/jardim.png')
+                                : AssetImage('lib/estufa.png'))),
+                    child: CustomMultiChildLayout(
+                        delegate: MapLayout(markerList: currentMarkers),
+                        children: <Widget>[
+                          for (var marker in currentMarkers)
+                            LayoutId(
+                                id: marker.id,
+                                child: TextButton(
+                                  onPressed: () {
+                                    ScaffoldMessenger.of(context)
+                                        .hideCurrentSnackBar();
+                                    if (deleteMarker) {
+                                      removeMarker(marker);
+                                    } else {
+                                      if (currentGarden == 1) {
+                                        if (images1[markers1.indexOf(marker)]
+                                            .isEmpty) {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      AddImageScreen(
+                                                        marker: marker,
+                                                        currentGarden:
+                                                            currentGarden,
+                                                      )));
+                                        } else {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      Timeline(
+                                                        indexOf: markers1
+                                                            .indexOf(marker),
+                                                        currentGarden:
+                                                            currentGarden,
+                                                        marker: marker,
+                                                      )));
+                                        }
+                                      } else {
+                                        if (images2[markers2.indexOf(marker)]
+                                            .isEmpty) {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      AddImageScreen(
+                                                        marker: marker,
+                                                        currentGarden:
+                                                            currentGarden,
+                                                      )));
+                                        } else {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      Timeline(
+                                                        indexOf: markers2
+                                                            .indexOf(marker),
+                                                        currentGarden:
+                                                            currentGarden,
+                                                        marker: marker,
+                                                      )));
+                                        }
+                                      }
+                                    }
+                                  },
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      const Icon(
+                                        Icons.location_on,
+                                        size: markerSize,
+                                        color: Color(0xFF8D021F),
+                                      ),
+                                      Text(
+                                        marker.name,
+                                        style: TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: markerSize / 2.3),
+                                      )
+                                    ],
                                   ),
-                                )
-                              ],
-                            ),
+                                ))
+                        ]),
+                  ),
+                ),
+              ),
+
+              Positioned(
+                child: AnimatedOpacity(
+                  opacity: openMapSearch ? 1 : 0,
+                  duration: fadeTime,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: TextField(
+                      focusNode: focusNode,
+                      controller: searchMarkerController,
+                      decoration: InputDecoration(
+                          hintText: "Search marker",
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            color: iconColor,
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(25.0))
                           )
-                        )
-                    ]
-                  ),
-                ),
-              ),
-            ),
-
-
-            // --------------------- WIDGET DE DRAWER : copiar este widget
-            SlidingUpPanel(
-              backdropTapClosesPanel: true,
-              color: Color(0xff054f20),
-              controller: panelController,
-              maxHeight: panelHeightOpen,
-              minHeight: panelHeightClosed,
-              borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(15)),
-              panelBuilder: (controller) => PanelWidget(
-                controller: controller,
-                panelController: panelController,
-              ),
-              onPanelSlide: (position) => setState(() {
-                buttonPosition =
-                    position * (panelHeightOpen - panelHeightClosed)
-                      + initButtonPosition;
-                panelClosed = buttonPosition == initButtonPosition;
-                openMapSearch = false;
-              }),
-            ),
-
-            // --------------------- WIDGET DE PESQUISA
-            Positioned(
-              child: AnimatedOpacity(
-                opacity: openMapSearch ? 1 : 0,
-                duration: fadeTime,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: TextField(
-                    focusNode: focusNode,
-                    controller: searchMarkerController,
-                    decoration: InputDecoration(
-                      hintText: "Search marker",
-                      prefixIcon: const Icon(
-                        Icons.search,
-                        color: iconColor,
                       ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                              Radius.circular(25.0))
-                      )
+                      onChanged: searchMarker,
                     ),
-                    onChanged: searchMarker,
                   ),
                 ),
               ),
-            ),
 
-            // --------------------- BOTAO DO MARKER
-            Positioned(
-              right: padding,
-              bottom: buttonPosition,
-              child: AnimatedOpacity(
-                duration: fadeTime,
-                opacity: panelClosed ? 1 : 0,
-                child: markerButton(context),
-              ),
-            ),
-
-            // --------------------- BOTAO DE SETTINGS
-            Positioned(
-              left: padding,
-              bottom: buttonPosition,
-              child: AnimatedOpacity(
+              // --------------------- BOTAO DO MARKER
+              Positioned(
+                right: padding,
+                bottom: buttonPosition,
+                child: AnimatedOpacity(
                   duration: fadeTime,
                   opacity: panelClosed ? 1 : 0,
-                  child: generalButton(context, Icons.settings)
+                  child: markerButton(context),
+                ),
               ),
-            ),
 
-            // --------------------- BOTAO DE AJUDA
-            Positioned(
-              left: padding,
-              bottom: buttonPosition + buttonSize + padding,
-              child: AnimatedOpacity(
-                  duration: fadeTime,
-                  opacity: panelClosed ? 1 : 0,
-                  child: generalButton(context, Icons.question_mark)
+              // --------------------- BOTAO DE SETTINGS
+              Positioned(
+                left: padding,
+                bottom: buttonPosition,
+                child: AnimatedOpacity(
+                    duration: fadeTime,
+                    opacity: panelClosed ? 1 : 0,
+                    child: generalButton(context, Icons.settings)),
               ),
-            ),
 
-            // --------------------- BOTAO DE USER
-            Positioned(
+              // --------------------- BOTAO DE AJUDA
+              Positioned(
+                left: padding,
+                bottom: buttonPosition + buttonSize + padding,
+                child: AnimatedOpacity(
+                    duration: fadeTime,
+                    opacity: panelClosed ? 1 : 0,
+                    child: generalButton(context, Icons.question_mark)),
+              ),
+
+              // --------------------- BOTAO DE USER
+              Positioned(
               left: padding,
               top: padding,
               child: AnimatedOpacity(
                   duration: fadeTime,
                   opacity: (panelClosed && !openMapSearch) ? 1 : 0,
-                  child: generalButton(context, Icons.person)
-              ),
+                  child: generalButton(context, Icons.person)),
             ),
-          ],
-
+            ]
+          )
         ),
       ),
     );
@@ -403,96 +400,93 @@ class _HomePageState extends State<HomePage> {
           },
         ),
         SpeedDialChild(
-          child: const Icon(Icons.delete_forever),
-          backgroundColor: transparencyLvl,
-          foregroundColor: iconColor,
-          elevation: elevation,
-          onTap: () {
-            FocusManager.instance.primaryFocus?.unfocus();
-            setState(() => searchMarkerController.clear());
-            showDialog(
-              context: context,
-              builder: (BuildContext context) => AlertDialog(
-                title: const Text("Click on the marker that you want to delete."),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context, 'OK');
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      final snackBar = SnackBar(
-                        content: Text('Select the marker that you want to delete.'),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      setState(() => deleteMarker = true);
-                    },
-                    child: const Text('OK')
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, 'Cancel'),
-                    child: const Text('Cancel')
-                  )
-                ],
-              ));
-          }
-        ),
+            child: const Icon(Icons.delete_forever),
+            backgroundColor: transparencyLvl,
+            foregroundColor: iconColor,
+            elevation: elevation,
+            onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              setState(() => searchMarkerController.clear());
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                        title: const Text(
+                            "Click on the marker that you want to delete."),
+                        actions: <Widget>[
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context, 'OK');
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                final snackBar = SnackBar(
+                                  content: Text(
+                                      'Select the marker that you want to delete.'),
+                                );
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                                setState(() => deleteMarker = true);
+                              },
+                              child: const Text('OK')),
+                          TextButton(
+                              onPressed: () => Navigator.pop(context, 'Cancel'),
+                              child: const Text('Cancel'))
+                        ],
+                      ));
+            }),
         SpeedDialChild(
-          child: const Icon(Icons.add),
-          backgroundColor: transparencyLvl,
-          foregroundColor: iconColor,
-          elevation: elevation,
-          onTap: () {
-            FocusManager.instance.primaryFocus?.unfocus();
-            setState(() {
-              currentMarkers = (currentGarden == 1) ? markers1 : markers2;
-              searchMarkerController.clear();
-            });
-            showDialog(
-              context: context,
-              builder: (BuildContext context) => AlertDialog(
-                title: const Text("Tap on the map where you want to place the marker."),
-                content: TextField(
-                  controller: newMarkerController,
-                  decoration: const InputDecoration(
-                    hintText: "Marker name",
-                    prefixIcon: Icon(Icons.location_on),
-                  ),
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      final name = newMarkerController.text;
-                      Navigator.pop(context, 'OK');
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      final snackBar = SnackBar(
-                        content: Text('Select where to place the marker.'),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      addMarker(name);
-                      newMarkerController.clear();
-                    },
-                    child: const Text('OK')
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, 'Cancel'),
-                    child: const Text('Cancel')
-                  )
-                ],
-              )
-            );
-          }
-        ),
+            child: const Icon(Icons.add),
+            backgroundColor: transparencyLvl,
+            foregroundColor: iconColor,
+            elevation: elevation,
+            onTap: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              setState(() {
+                currentMarkers = (currentGarden == 1) ? markers1 : markers2;
+                searchMarkerController.clear();
+              });
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                        title: const Text(
+                            "Tap on the map where you want to place the marker."),
+                        content: TextField(
+                          controller: newMarkerController,
+                          decoration: const InputDecoration(
+                            hintText: "Marker name",
+                            prefixIcon: Icon(Icons.location_on),
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                              onPressed: () {
+                                final name = newMarkerController.text;
+                                Navigator.pop(context, 'OK');
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                final snackBar = SnackBar(
+                                  content:
+                                      Text('Select where to place the marker.'),
+                                );
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                                addMarker(name);
+                                newMarkerController.clear();
+                              },
+                              child: const Text('OK')),
+                          TextButton(
+                              onPressed: () => Navigator.pop(context, 'Cancel'),
+                              child: const Text('Cancel'))
+                        ],
+                      ));
+            }),
       ],
     );
   }
-
 }
 
 class MapLayout extends MultiChildLayoutDelegate {
   final List<Marker> markerList;
   final constraints = BoxConstraints(
-      maxHeight: _HomePageState.markerSize*3,
-      maxWidth: _HomePageState.markerSize*4
-  );
+      maxHeight: _HomePageState.markerSize * 3,
+      maxWidth: _HomePageState.markerSize * 4);
 
   MapLayout({required this.markerList});
 
@@ -508,5 +502,4 @@ class MapLayout extends MultiChildLayoutDelegate {
   bool shouldRelayout(MapLayout oldDelegate) {
     return (markerList != oldDelegate.markerList);
   }
-
 }

@@ -16,63 +16,61 @@ class AddImageScreen extends StatelessWidget {
   Widget build(BuildContext context){
     final bottomBarHeight = MediaQuery.of(context).size.height * 0.1;
     return Scaffold(
-      body: Center(
-          child : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const SizedBox(height:30),
-                const Text("This marker has no images yet!", style: TextStyle(fontSize: 20, color: Colors.black54)),
-                const SizedBox(height:30),
-                const Text("Choose how to add an image:", style: TextStyle(fontSize: 15, color: Colors.black54)),
-                const SizedBox(height:30),
-                Row(mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      ElevatedButton(
-                        onPressed:() async {
-                         ImageData image = await addImage(true, marker,context);
-                         final navigator = Navigator.of(context);
+        body: Center(
+            child : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const SizedBox(height:30),
+                  const Text("This marker has no images yet!", style: TextStyle(fontSize: 20, color: Colors.black54)),
+                  const SizedBox(height:30),
+                  const Text("Choose how to add an image:", style: TextStyle(fontSize: 15, color: Colors.black54)),
+                  const SizedBox(height:30),
+                  Row(mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        ElevatedButton(
+                          onPressed:() async {
+                            await addImage(true, marker,context);
+                            final navigator = Navigator.of(context);
 
-                         //moveToEditImage(context, image, marker);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          shape : const CircleBorder(),
-                          padding: const EdgeInsets.all(20),
+                            //moveToEditImage(context, image, marker);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            shape : const CircleBorder(),
+                            padding: const EdgeInsets.all(20),
+                          ),
+                          child: const Icon(Icons.camera_alt,size:54),
                         ),
-                        child: const Icon(Icons.camera_alt,size:54),
-                      ),
-                      const SizedBox(width:30),
-                      ElevatedButton(
-                        onPressed:() async {
-                          await addImage(false, marker,context);
+                        const SizedBox(width:30),
+                        ElevatedButton(
+                          onPressed:() async {
+                            await addImage(false, marker,context);
 
-                          //moveToEditImage(context, image, marker);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          shape : const CircleBorder(),
-                          padding: const EdgeInsets.all(20),
+                            //moveToEditImage(context, image, marker);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            shape : const CircleBorder(),
+                            padding: const EdgeInsets.all(20),
+                          ),
+                          child: const Icon(Icons.add_photo_alternate,size:54),
                         ),
-                        child: const Icon(Icons.add_photo_alternate,size:54),
-                      ),
-                    ]),
-              ])
-      ),
+                      ]),
+                ])
+        ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             color: Color(0xff054f20),
-            borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(15)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
             boxShadow: [ BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: Offset(0, 3),
-              )
-            ],
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: Offset(0, 3),
+            )],
           ),
           height: bottomBarHeight,
           child: Align(
-            alignment: Alignment.center,
-            child: Text(marker.name,style: TextStyle(fontSize: 25, color: Colors.white))
+              alignment: Alignment.center,
+              child: Text(marker.name,style: TextStyle(fontSize: 25, color: Colors.white))
           ),
         )
     );
@@ -84,9 +82,9 @@ class AddImageScreen extends StatelessWidget {
     final navigator = Navigator.of(context);
     XFile? image;
     if(useCamera)
-      {image = await ImagePicker().pickImage(source: ImageSource.camera);}
+    {image = await ImagePicker().pickImage(source: ImageSource.camera);}
     else
-      {image = await ImagePicker().pickImage(source: ImageSource.gallery);}
+    {image = await ImagePicker().pickImage(source: ImageSource.gallery);}
     if(image == null) return;
     final now = DateTime.now();
     int markerIndex = markers1.indexOf(marker);

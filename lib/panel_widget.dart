@@ -21,26 +21,6 @@ class _PanelWidgetState extends State<PanelWidget> {
   final textController = TextEditingController();
   List<Garden> gardenOptions = gardens;
 
-  void togglePanel() => widget.panelController.isPanelOpen
-      ? widget.panelController.close()
-      : widget.panelController.open();
-
-
-  Widget buildHandle() {
-    return GestureDetector(
-      onTap: togglePanel,
-      child: Center(
-        child: Container(
-        width: 30,
-        height: 5,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(25),
-          color: const Color(0xFFE0E0E0),
-          ),
-        ),
-      )
-    );
-  }
 
   void searchGarden(String query) {
     final suggestions = gardens.where((garden) {
@@ -76,7 +56,7 @@ class _PanelWidgetState extends State<PanelWidget> {
           title: Center(
             child: Text(
               (currentGarden == 1) ? "Jardim Botânico de Lisboa" : "Estufa Fria",
-              style: TextStyle(fontSize: 18, color: Color(0xFFD3D3D3)),
+              style: TextStyle(fontSize: 21, color: Color(0xFFD3D3D3)),
             ),
           ),
         ),

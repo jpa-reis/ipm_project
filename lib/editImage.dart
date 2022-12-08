@@ -120,8 +120,7 @@ class EditImageState extends State<EditImageScreen> {
               spreadRadius: 5,
               blurRadius: 7,
               offset: Offset(0, 3),
-            )
-            ],
+            )],
           ),
           height: bottomBarHeight,
           child: Align(
