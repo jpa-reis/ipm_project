@@ -34,7 +34,6 @@ class EditImageState extends State<EditImageScreen> {
   Widget build(BuildContext context) {
     final bottomBarHeight = MediaQuery.of(context).size.height * 0.1;
     return Scaffold(
-      backgroundColor: Color(0xFF75A889),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
       body: SingleChildScrollView(
@@ -79,8 +78,10 @@ class EditImageState extends State<EditImageScreen> {
                       onChanged: (value) {
                         setState((){communitySwitch = value;});
                       },
-                      activeTrackColor: Colors.lightGreenAccent,
-                      activeColor: Colors.green,
+                      activeTrackColor: Colors.green,
+                      activeColor: Color(0xff054f20),
+                      inactiveTrackColor:Colors.grey,
+                      inactiveThumbColor: Color(0xff054f20),
                     ),
                   ]
               ),
@@ -109,21 +110,19 @@ class EditImageState extends State<EditImageScreen> {
           }
           moveToTimeline(context,widget.marker);
         },
-        backgroundColor: Colors.green,
+        backgroundColor: Color(0xff054f20),
         child: const Icon(Icons.save),
       ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color:Color(0xFF75A889),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+            color:Color(0xff054f20),
             boxShadow: const [
-              BoxShadow(color: Colors.black38, spreadRadius: 0, blurRadius: 10),
             ],
           ),
           height: bottomBarHeight,
           child: Align(
               alignment: Alignment.center,
-              child: Text(widget.marker.name,style: TextStyle(fontSize: 25, color: Colors.black))
+              child: Text(widget.marker.name,style: TextStyle(fontSize: 25, color: Color(0xFFD3D3D3)))
           ),
         )
     );

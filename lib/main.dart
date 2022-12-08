@@ -244,11 +244,9 @@ class _HomePageState extends State<HomePage> {
 
             // --------------------- WIDGET DE DRAWER : copiar este widget
             SlidingUpPanel(
-              color: Color(0xFF75A889),
+              color: Color(0xff054f20),
               boxShadow: [],
               controller: panelController,
-              borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(15)),
               maxHeight: panelHeightOpen,
               minHeight: panelHeightClosed,
               panelBuilder: (controller) => PanelWidget(

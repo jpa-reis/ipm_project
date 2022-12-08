@@ -176,6 +176,7 @@ class ShowPhotoState extends State<ShowPhoto> {
               ),
 
               SlidingUpPanel(
+                color: Color(0xff054f20),
                 controller: panelController,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                 maxHeight: panelHeightOpen,

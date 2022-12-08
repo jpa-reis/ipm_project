@@ -5,9 +5,9 @@ class Marker {
   final Offset position;
   final String name;
   final int id;
-  final String description;
+  String description;
 
-  const Marker({
+  Marker({
     required this.position,
     required this.name,
     required this.id,

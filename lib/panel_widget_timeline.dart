@@ -70,19 +70,30 @@ class _PanelWidgetTimelineState extends State<PanelWidgetTimeline> {
           title: Center(
             child: Text(
               widget.marker.name,
-              style: TextStyle(fontSize: 19),
+              style: TextStyle(fontSize: 19, color: Color(0xFFD3D3D3)),
             ),
           ),
         ),
+        SizedBox(height: 2,),
         Divider(
           thickness: 1.0,
           indent: 30.0,
           endIndent: 30.0,
+          color: Color(0xFFD3D3D3),
         ),
         const SizedBox(height: 10),
         ListTile(
-          title: Text(
-              widget.marker.description),
+          title: widget.marker.description == "" ? Row(
+            children: [
+              Text("This marker has no description yet!", style: TextStyle(color: Color(0xFFD3D3D3)),),
+              Center(
+                child: IconButton(icon: Icon( Icons.edit, color: Color(0xFFD3D3D3),), onPressed: () { setState(() {
+                  widget.marker.description = "Sample description";
+                });},),
+              ),
+            ],
+          ) : Text(
+              widget.marker.description, style: TextStyle(color: Color(0xFFD3D3D3)),),
         )
       ],
     );

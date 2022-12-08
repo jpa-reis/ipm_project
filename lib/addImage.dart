@@ -19,13 +19,14 @@ class AddImageScreen extends StatelessWidget {
   Widget build(BuildContext context){
     final bottomBarHeight = MediaQuery.of(context).size.height * 0.1;
     return Scaffold(
-      backgroundColor: Color(0xFF65a765),
       body: Center(
           child : Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 const SizedBox(height:30),
-                const Text("Choose how to add an image:"),
+                const Text("This marker has no images yet!", style: TextStyle(fontSize: 20, color: Colors.black54)),
+                const SizedBox(height:30),
+                const Text("Choose how to add an image:", style: TextStyle(fontSize: 15, color: Colors.black54)),
                 const SizedBox(height:30),
                 Row(mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -60,16 +61,14 @@ class AddImageScreen extends StatelessWidget {
       ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color: Color(0xFF75A889),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+            color: Color(0xff054f20),
             boxShadow: const [
-              BoxShadow(color: Colors.black38, spreadRadius: 0, blurRadius: 10),
             ],
           ),
           height: bottomBarHeight,
           child: Align(
             alignment: Alignment.center,
-            child: Text(marker.name,style: TextStyle(fontSize: 25, color: Colors.black))
+            child: Text(marker.name,style: TextStyle(fontSize: 25, color: Colors.white))
           ),
         )
     );

@@ -42,7 +42,7 @@ class _TimelineState extends State<Timeline> {
   @override
   Widget build(BuildContext context) {
     final panelHeightClosed = MediaQuery.of(context).size.height * 0.1;
-    final panelHeightOpen = MediaQuery.of(context).size.height * 0.9;
+    final panelHeightOpen = MediaQuery.of(context).size.height * 0.85;
     final panelController = PanelController();
     const double buttonSize = 50.0;
     const double initButtonPosition = buttonSize + 30.0;
@@ -75,7 +75,7 @@ class _TimelineState extends State<Timeline> {
                       bottom: TabBar(
                           padding: EdgeInsets.all(8.0),
                           labelColor: Colors.white,
-                          unselectedLabelColor: Colors.white,
+                          unselectedLabelColor:Color(0xFFD3D3D3),
                           indicatorSize: TabBarIndicatorSize.label,
                           indicator: BoxDecoration(
                               borderRadius: BorderRadius.all(Radius.circular(30)),
@@ -111,10 +111,10 @@ class _TimelineState extends State<Timeline> {
             ),
           ),
           SlidingUpPanel(
-            color: Color(0xFF75A889),
+            boxShadow: [],
+            color: Color(0xff054f20),
             controller: panelController,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-            maxHeight: panelHeightOpen,
+            maxHeight: widget.marker.description == "" ?  170 : panelHeightOpen,
             minHeight: panelHeightClosed,
             panelBuilder: (controller) => PanelWidgetTimeline(
               marker: widget.marker,
@@ -282,18 +282,18 @@ class _TimelineState extends State<Timeline> {
       );
 
   }
-
+//Color(0xff054f20)
   Widget startingTimeline() {
     return TimelineTile(
       afterLineStyle: LineStyle(
-        color: Color(0xFF618A3D),
+        color: Color(0xff054f20),
         thickness: 3,
       ),
       indicatorStyle: IndicatorStyle(
         drawGap: true,
         width: 30,
         height: 30,
-        color: Color(0xFF618A3D),
+        color: Color(0xff054f20),
       ),
       alignment: TimelineAlign.manual,
       lineXY: 0.15,
@@ -301,7 +301,7 @@ class _TimelineState extends State<Timeline> {
       endChild: Center(
         child: Text(
           "Timeline starts here...",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
       ),
     );
@@ -310,7 +310,7 @@ class _TimelineState extends State<Timeline> {
   Widget evenTimeline(int i) {
     return TimelineTile(
       beforeLineStyle: LineStyle(
-        color: Color(0xFF618A3D),
+        color: Color(0xff054f20),
         thickness: 3,
       ),
       indicatorStyle: IndicatorStyle(
@@ -322,7 +322,7 @@ class _TimelineState extends State<Timeline> {
         indicator: Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color: Color(0xFF618A3D),
+              color: Color(0xff054f20),
               width: 3,
             ),
             shape: BoxShape.circle,
@@ -333,7 +333,7 @@ class _TimelineState extends State<Timeline> {
                   ? DateFormat('MM-dd').format(images1[indexOf][i].date)
                   : DateFormat('MM-dd').format(images2[indexOf][i].date),
               style: TextStyle(
-                  fontWeight: FontWeight.bold, color: Color(0xFF618A3D)),
+                  fontWeight: FontWeight.bold, color: Color(0xff054f20)),
             ),
           ),
         ),
@@ -392,7 +392,7 @@ class _TimelineState extends State<Timeline> {
   Widget evenTimelineCommunity(int i) {
     return TimelineTile(
       beforeLineStyle: LineStyle(
-        color: Color(0xFF618A3D),
+        color: Color(0xff054f20),
         thickness: 3,
       ),
       indicatorStyle: IndicatorStyle(
@@ -404,7 +404,7 @@ class _TimelineState extends State<Timeline> {
         indicator: Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color: Color(0xFF618A3D),
+              color: Color(0xff054f20),
               width: 3,
             ),
             shape: BoxShape.circle,
@@ -415,7 +415,7 @@ class _TimelineState extends State<Timeline> {
                     ? DateFormat('MM-dd').format(images1[indexOf][i].date)
                     : DateFormat('MM-dd').format(images2[indexOf][i].date),
               style: TextStyle(
-                  fontWeight: FontWeight.bold, color: Color(0xFF618A3D)),
+                  fontWeight: FontWeight.bold, color: Color(0xff054f20)),
             ),
           ),
         ),
@@ -474,7 +474,7 @@ class _TimelineState extends State<Timeline> {
   Widget oddTimeline(int i) {
     return TimelineTile(
       beforeLineStyle: LineStyle(
-        color: Color(0xFF618A3D),
+        color: Color(0xff054f20),
         thickness: 3,
       ),
       indicatorStyle: IndicatorStyle(
@@ -486,7 +486,7 @@ class _TimelineState extends State<Timeline> {
         indicator: Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color: Color(0xFF618A3D),
+              color: Color(0xff054f20),
               width: 3,
             ),
             shape: BoxShape.circle,
@@ -497,7 +497,7 @@ class _TimelineState extends State<Timeline> {
                   ? DateFormat('MM-dd').format(images1[indexOf][i].date)
                   : DateFormat('MM-dd').format(images2[indexOf][i].date),
               style: TextStyle(
-                  fontWeight: FontWeight.bold, color: Color(0xFF618A3D)),
+                  fontWeight: FontWeight.bold, color: Color(0xff054f20)),
             ),
           ),
         ),
@@ -556,7 +556,7 @@ class _TimelineState extends State<Timeline> {
   Widget oddTimelineCommunity(int i) {
     return TimelineTile(
       beforeLineStyle: LineStyle(
-        color: Color(0xFF618A3D),
+        color: Color(0xff054f20),
         thickness: 3,
       ),
       indicatorStyle: IndicatorStyle(
@@ -568,7 +568,7 @@ class _TimelineState extends State<Timeline> {
         indicator: Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color: Color(0xFF618A3D),
+              color: Color(0xff054f20),
               width: 3,
             ),
             shape: BoxShape.circle,
@@ -579,7 +579,7 @@ class _TimelineState extends State<Timeline> {
                   ? DateFormat('MM-dd').format(images1[indexOf][i].date)
                   : DateFormat('MM-dd').format(images2[indexOf][i].date),
               style: TextStyle(
-                  fontWeight: FontWeight.bold, color: Color(0xFF618A3D)),
+                  fontWeight: FontWeight.bold, color: Color(0xff054f20)),
             ),
           ),
         ),
@@ -638,26 +638,26 @@ class _TimelineState extends State<Timeline> {
   Widget lastTimelineOdd() {
     return TimelineTile(
       beforeLineStyle: LineStyle(
-        color: Color(0xFF618A3D),
+        color: Color(0xff054f20),
         thickness: 3,
       ),
       afterLineStyle: LineStyle(
-        color: Color(0xFF618A3D),
+        color: Color(0xff054f20),
         thickness: 3,
       ),
       indicatorStyle: IndicatorStyle(
         drawGap: true,
         width: 30,
         height: 30,
-        color: Color(0xFF618A3D),
+        color: Color(0xff054f20),
       ),
       alignment: TimelineAlign.manual,
       lineXY: 0.15,
       isLast: true,
       endChild: Center(
         child: Text(
-          "Timeline ends here...",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          "Timeline ends here!",
+          style: TextStyle(fontWeight: FontWeight.bold, color:Colors.black),
         ),
       ),
     );
@@ -666,18 +666,18 @@ class _TimelineState extends State<Timeline> {
   Widget lastTimelineEven() {
     return TimelineTile(
       beforeLineStyle: LineStyle(
-        color: Color(0xFF618A3D),
+        color: Color(0xff054f20),
         thickness: 3,
       ),
       afterLineStyle: LineStyle(
-        color: Color(0xFF618A3D),
+        color: Color(0xff054f20),
         thickness: 3,
       ),
       indicatorStyle: IndicatorStyle(
         drawGap: true,
         width: 30,
         height: 30,
-        color: Color(0xFF618A3D),
+        color: Color(0xff054f20),
       ),
       alignment: TimelineAlign.manual,
       lineXY: 0.85,
@@ -685,7 +685,7 @@ class _TimelineState extends State<Timeline> {
       endChild: Center(
         child: Text(
           "Timeline ends here...",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFD3D3D3)),
         ),
       ),
     );
@@ -696,7 +696,7 @@ class _TimelineState extends State<Timeline> {
       begin: 0.15,
       end: 0.85,
       thickness: 3,
-      color: Color(0xFF618A3D),
+      color: Color(0xff054f20),
     );
   }
 }
