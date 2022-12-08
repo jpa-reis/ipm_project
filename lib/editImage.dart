@@ -1,9 +1,6 @@
-import 'dart:developer';
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:ui';
 import 'package:intl/intl.dart';
-import 'package:ipm_project/main.dart';
 
 import 'imageData.dart';
 import 'marker.dart';
@@ -89,6 +86,7 @@ class EditImageState extends State<EditImageScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: (){
           widget.image.setDescription(descriptionController.text);
           widget.image.setCommunity(communitySwitch);
@@ -116,7 +114,13 @@ class EditImageState extends State<EditImageScreen> {
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             color:Color(0xff054f20),
-            boxShadow: const [
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+            boxShadow: [ BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: Offset(0, 3),
+            )
             ],
           ),
           height: bottomBarHeight,

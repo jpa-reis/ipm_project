@@ -3,7 +3,6 @@ library my_prj.globals;
 import 'package:flutter/material.dart';
 import 'gardens.dart';
 import 'imageData.dart';
-import 'timeline.dart';
 import 'marker.dart';
 
 enum PhotoModes{

@@ -1,27 +1,15 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
-import 'package:ipm_project/panel_widget.dart';
 import 'package:ipm_project/panel_widget_timeline.dart';
 import 'package:ipm_project/show_photo.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:timeline_tile/timeline_tile.dart';
-import 'dart:developer';
-
-import 'package:ipm_project/panel_widget.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
-
 import 'globals.dart';
 import 'imageData.dart';
 import 'marker.dart';
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'editImage.dart';
-import 'timeline.dart';
-import 'globals.dart';
-import 'imageData.dart';
 
 class Timeline extends StatefulWidget {
   const Timeline(
@@ -111,7 +99,8 @@ class _TimelineState extends State<Timeline> {
             ),
           ),
           SlidingUpPanel(
-            boxShadow: [],
+            borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(15)),
             color: Color(0xff054f20),
             controller: panelController,
             maxHeight: widget.marker.description == "" ?  170 : panelHeightOpen,

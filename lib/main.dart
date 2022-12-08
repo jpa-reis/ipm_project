@@ -76,6 +76,7 @@ class _HomePageState extends State<HomePage> {
   late double buttonPosition;
   late bool panelClosed;
   late bool openMapSearch;
+  late bool deleteMarker;
 
   Future<void> addMarker(String markerName) async {
     final completer = Completer<void>();
@@ -99,7 +100,8 @@ class _HomePageState extends State<HomePage> {
       markers2.add(newMarker);
       community2.add(<ImageData>[]);
     }
-    (currentGarden == 1) ? images1.add(<ImageData>[]) : images2.add(<ImageData>[]);
+    (currentGarden == 1) ? images1.add(<ImageData>[]) :
+        images2.add(<ImageData>[]);
   }
 
   late List<Marker> currentMarkers;
@@ -115,16 +117,31 @@ class _HomePageState extends State<HomePage> {
     setState(() => currentMarkers = suggestions);
   }
 
+  void removeMarker(Marker marker) {
+    setState(() {
+      if (currentGarden == 1) {
+        markers1.remove(marker);
+        currentMarkers = markers1;
+      }
+      else {
+        markers2.remove(marker);
+        currentMarkers = markers2;
+      }
+      deleteMarker = false;
+    });
+  }
+
   @override
   void initState() {
     transformationController.value = Matrix4.identity();
     transformationController.value.translate(-800.0, -600.0);
 
-    currentMarkers = markers1;
+    currentMarkers = (currentGarden == 1) ? markers1 : markers2;
     _tapPosition = const Offset(0.0, 0.0);
     buttonPosition = initButtonPosition;
     panelClosed = true;
     openMapSearch = false;
+    deleteMarker = false;
     super.initState();
   }
 
@@ -135,8 +152,6 @@ class _HomePageState extends State<HomePage> {
     final panelHeightOpen = MediaQuery.of(context).size.height * 0.9;
     padding = MediaQuery.of(context).size.height * 0.02;
     buttonPosition = panelHeightClosed + padding;
-
-    currentMarkers = (currentGarden == 1) ? markers1 : markers2;
 
     return SafeArea(
       child: Scaffold(
@@ -150,9 +165,9 @@ class _HomePageState extends State<HomePage> {
                 final offset = transformationController.toScene(
                     details.globalPosition);
                 setState(() {
-                  _tapPosition = Offset(offset.dx-35.0, offset.dy-65.0);
-                  print("AAAAA $_tapPosition");
+                  _tapPosition = Offset(offset.dx-35.0, offset.dy-95.0);
                   openMapSearch = false;
+                  deleteMarker = false;
                   nextButtonCompleter?.complete();
                   nextButtonCompleter = null;
                 });
@@ -163,7 +178,7 @@ class _HomePageState extends State<HomePage> {
                   FocusManager.instance.primaryFocus?.unfocus();
                 },
                 constrained: false,
-                minScale: 0.5,
+                minScale: 0.2,
                 maxScale: 1.1,
                 child: Container(
                   width: (currentGarden == 1) ? 4000 : 5200,
@@ -184,37 +199,40 @@ class _HomePageState extends State<HomePage> {
                           id: marker.id,
                           child: TextButton(
                             onPressed: () {
-                              if(currentGarden == 1){
-                                if(images1[markers1.indexOf(marker)].isEmpty){
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          AddImageScreen(marker: marker, currentGarden: currentGarden,)
-                                  ));
+                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                              if (deleteMarker) {
+                                removeMarker(marker);
+                              }
+                              else {
+                                if(currentGarden == 1){
+                                  if(images1[markers1.indexOf(marker)].isEmpty){
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) =>
+                                            AddImageScreen(marker: marker, currentGarden: currentGarden,)
+                                    ));
+                                  }
+                                  else{
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) =>
+                                            Timeline(indexOf: markers1.indexOf(marker), currentGarden: currentGarden, marker: marker,)
+                                    ));
+                                  }
                                 }
                                 else{
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          Timeline(indexOf: markers1.indexOf(marker), currentGarden: currentGarden, marker: marker,)
-                                  ));
+                                  if(images2[markers2.indexOf(marker)].isEmpty){
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) =>
+                                            AddImageScreen(marker: marker, currentGarden: currentGarden,)
+                                    ));
+                                  }
+                                  else{
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) =>
+                                            Timeline(indexOf: markers2.indexOf(marker), currentGarden: currentGarden, marker: marker,)
+                                    ));
+                                  }
                                 }
                               }
-                              else{
-                                if(images2[markers2.indexOf(marker)].isEmpty){
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          AddImageScreen(marker: marker, currentGarden: currentGarden,)
-                                  ));
-                                }
-                                else{
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) =>
-                                          Timeline(indexOf: markers2.indexOf(marker), currentGarden: currentGarden, marker: marker,)
-                                  ));
-                                }
-                              }
-
-
-
                             },
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.end,
@@ -244,20 +262,22 @@ class _HomePageState extends State<HomePage> {
 
             // --------------------- WIDGET DE DRAWER : copiar este widget
             SlidingUpPanel(
+              backdropTapClosesPanel: true,
               color: Color(0xff054f20),
-              boxShadow: [],
               controller: panelController,
               maxHeight: panelHeightOpen,
               minHeight: panelHeightClosed,
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(15)),
               panelBuilder: (controller) => PanelWidget(
                 controller: controller,
                 panelController: panelController,
               ),
               onPanelSlide: (position) => setState(() {
                 buttonPosition =
-                    position * (panelHeightOpen - panelHeightClosed) +
-                    initButtonPosition;
-                panelClosed = ((buttonPosition - initButtonPosition) == 0);
+                    position * (panelHeightOpen - panelHeightClosed)
+                      + initButtonPosition;
+                panelClosed = buttonPosition == initButtonPosition;
                 openMapSearch = false;
               }),
             ),
@@ -346,6 +366,7 @@ class _HomePageState extends State<HomePage> {
       height: buttonSize,
       width: buttonSize,
       child: FloatingActionButton(
+        heroTag: null,
         onPressed: () {},
         backgroundColor: transparencyLvl,
         foregroundColor: iconColor,
@@ -382,6 +403,39 @@ class _HomePageState extends State<HomePage> {
           },
         ),
         SpeedDialChild(
+          child: const Icon(Icons.delete_forever),
+          backgroundColor: transparencyLvl,
+          foregroundColor: iconColor,
+          elevation: elevation,
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+            setState(() => searchMarkerController.clear());
+            showDialog(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text("Click on the marker that you want to delete."),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context, 'OK');
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      final snackBar = SnackBar(
+                        content: Text('Select the marker that you want to delete.'),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      setState(() => deleteMarker = true);
+                    },
+                    child: const Text('OK')
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'Cancel'),
+                    child: const Text('Cancel')
+                  )
+                ],
+              ));
+          }
+        ),
+        SpeedDialChild(
           child: const Icon(Icons.add),
           backgroundColor: transparencyLvl,
           foregroundColor: iconColor,
@@ -395,7 +449,7 @@ class _HomePageState extends State<HomePage> {
             showDialog(
               context: context,
               builder: (BuildContext context) => AlertDialog(
-                title: const Text("Add a new marker"),
+                title: const Text("Tap on the map where you want to place the marker."),
                 content: TextField(
                   controller: newMarkerController,
                   decoration: const InputDecoration(
@@ -410,7 +464,6 @@ class _HomePageState extends State<HomePage> {
                       Navigator.pop(context, 'OK');
                       FocusManager.instance.primaryFocus?.unfocus();
                       final snackBar = SnackBar(
-                        duration: Duration(seconds: 6),
                         content: Text('Select where to place the marker.'),
                       );
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);

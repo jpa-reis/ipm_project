@@ -1,12 +1,9 @@
-import 'dart:developer';
-
 import 'globals.dart';
 import 'imageData.dart';
 import 'marker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'editImage.dart';
-import 'timeline.dart';
 
 // a widget that allows users to choose how to add an image
 class AddImageScreen extends StatelessWidget {
@@ -46,7 +43,7 @@ class AddImageScreen extends StatelessWidget {
                       const SizedBox(width:30),
                       ElevatedButton(
                         onPressed:() async {
-                          ImageData image = await addImage(false, marker,context);
+                          await addImage(false, marker,context);
 
                           //moveToEditImage(context, image, marker);
                         },
@@ -62,7 +59,14 @@ class AddImageScreen extends StatelessWidget {
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             color: Color(0xff054f20),
-            boxShadow: const [
+            borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(15)),
+            boxShadow: [ BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3),
+              )
             ],
           ),
           height: bottomBarHeight,
@@ -76,23 +80,23 @@ class AddImageScreen extends StatelessWidget {
 }
 
 //adds image to images list and moves to edit screen of that image
-addImage(bool useCamera, Marker marker,BuildContext context) async{
-  final navigator = Navigator.of(context);
-  XFile? image;
-  if(useCamera)
-    {image = await ImagePicker().pickImage(source: ImageSource.camera);}
-  else
-    {image = await ImagePicker().pickImage(source: ImageSource.gallery);}
-  if(image == null) return;
-  final now = DateTime.now();
-  int markerIndex = markers1.indexOf(marker);
-  ImageData i = ImageData(imagePath: image.path,date: now,markerIndex: markerIndex);
-  if(currentGarden == 1){
-    images1[markers1.indexOf(marker)].add(i);
+  addImage(bool useCamera, Marker marker,BuildContext context) async{
+    final navigator = Navigator.of(context);
+    XFile? image;
+    if(useCamera)
+      {image = await ImagePicker().pickImage(source: ImageSource.camera);}
+    else
+      {image = await ImagePicker().pickImage(source: ImageSource.gallery);}
+    if(image == null) return;
+    final now = DateTime.now();
+    int markerIndex = markers1.indexOf(marker);
+    ImageData i = ImageData(imagePath: image.path,date: now,markerIndex: markerIndex);
+    if(currentGarden == 1){
+      images1[markers1.indexOf(marker)].add(i);
+    }
+    else{
+      images2[markers2.indexOf(marker)].add(i);
+    }
+    navigator.push(MaterialPageRoute(
+        builder: (context) => EditImageScreen(image: i, marker: marker, currentGarden: currentGarden,)));
   }
-  else{
-    images2[markers2.indexOf(marker)].add(i);
-  }
-  navigator.push(MaterialPageRoute(
-      builder: (context) => EditImageScreen(image: i, marker: marker, currentGarden: currentGarden,)));
-}

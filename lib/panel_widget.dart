@@ -34,7 +34,7 @@ class _PanelWidgetState extends State<PanelWidget> {
         width: 30,
         height: 5,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(25),
           color: const Color(0xFFE0E0E0),
           ),
         ),
@@ -62,7 +62,16 @@ class _PanelWidgetState extends State<PanelWidget> {
       controller: widget.controller,
       children: <Widget>[
         const SizedBox(height: 10),
-        buildHandle(),
+        Center(
+          child: Container(
+            width: 30,
+            height: 5,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25),
+              color: const Color(0xFFE0E0E0),
+            ),
+          ),
+        ),
         ListTile(
           title: Center(
             child: Text(
@@ -77,7 +86,7 @@ class _PanelWidgetState extends State<PanelWidget> {
             controller: textController,
             decoration: const InputDecoration(
                 hintText: "Search",
-              hintStyle: TextStyle(color: Color(0xFFD3D3D3)),
+                hintStyle: TextStyle(color: Color(0xFFD3D3D3)),
                 prefixIcon: Icon(Icons.search, color: Color(0xFFD3D3D3),),
             ),
             onChanged: searchGarden,
@@ -89,7 +98,10 @@ class _PanelWidgetState extends State<PanelWidget> {
           itemBuilder: (context, index) {
             final garden = gardenOptions[index];
             return ListTile(
-              title: Text(garden.name, style: TextStyle(color: Color(0xFFD3D3D3)),),
+              title: Text(
+                garden.name,
+                style: TextStyle(color: Color(0xFFD3D3D3)),
+              ),
               onTap: () => setState(() {
                 currentGarden = garden.id;
                 widget.panelController.close();

@@ -1,9 +1,7 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
 import 'package:intl/intl.dart';
 import 'package:ipm_project/editImage.dart';
-import 'package:ipm_project/panel_widget.dart';
 import 'package:ipm_project/panel_widget_timeline.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -179,6 +177,13 @@ class ShowPhotoState extends State<ShowPhoto> {
                 color: Color(0xff054f20),
                 controller: panelController,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                boxShadow: [ BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  )
+                ],
                 maxHeight: panelHeightOpen,
                 minHeight: panelHeightClosed,
                 panelBuilder: (controller) => PanelWidgetTimeline(
